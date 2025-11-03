@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "779057309471",
+    "project_id": "softhats",
+    "storage_bucket": "softhats.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779057309471:android:830f2f6c7253e45c05b22a",
+        "android_client_info": {
+          "package_name": "com.example.softhats"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqkbPuRItBPb-MP742IkrIeoRK5jEri6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
