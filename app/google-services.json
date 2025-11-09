@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "779057309471",
-    "project_id": "softhats",
-    "storage_bucket": "softhats.firebasestorage.app"
+    "project_number": "196016615547",
+    "project_id": "softhats-1c58e",
+    "storage_bucket": "softhats-1c58e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:779057309471:android:830f2f6c7253e45c05b22a",
+        "mobilesdk_app_id": "1:196016615547:android:69ca0d88a7fc36c97cb2de",
         "android_client_info": {
           "package_name": "com.example.softhats"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "196016615547-lloodo1m13q1abb7qejppjer1oua0h7h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.softhats",
+            "certificate_hash": "2209e3bef9fcc6f8632458e46d025c5f8c4cbfa9"
+          }
+        },
+        {
+          "client_id": "196016615547-kvr4ntsntik0tfqah6rovmm2mhlqfmmr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAqkbPuRItBPb-MP742IkrIeoRK5jEri6g"
+          "current_key": "AIzaSyC8LN0AZ6-TnB6tZ3bxI3jG04gDQKmIAck"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196016615547-kvr4ntsntik0tfqah6rovmm2mhlqfmmr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
