@@ -21,7 +21,6 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
         googleClient = GoogleSignIn.getClient(this, gso)
 
@@ -33,6 +32,11 @@ class ProfileActivity : AppCompatActivity() {
             googleClient.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+
+        binding.btnAbrirMapaPerfil.setOnClickListener {
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
         }
     }
 }
