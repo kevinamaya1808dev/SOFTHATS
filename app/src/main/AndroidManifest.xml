@@ -12,11 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SOFTHATS">
         <activity
+<<<<<<< Updated upstream
             android:name=".DetalleGorraActivity"
             android:exported="false" />
         <activity
             android:name=".HomeActivity"
             android:exported="false" /> <!-- Pantalla principal: Login (la que se abre al iniciar la app) -->
+=======
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <!-- Pantalla principal: Login (la que se abre al iniciar la app) -->
+>>>>>>> Stashed changes
         <activity
             android:name=".LoginActivity"
             android:exported="true">
