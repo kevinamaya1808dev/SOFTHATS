@@ -1,10 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".DetalleGorraActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Contenido Principal Desplazable -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="?attr/actionBarSize">
+
+        <!-- ESTE BLOQUE ES LA CLAVE: Aquí va el contenido del ScrollView -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
+
+            <!-- 1. Imagen de la Gorra -->
+            <ImageView
+                android:id="@+id/ivFotoDetalle"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+            <!-- 2. Nombre -->
+            <TextView
+                android:id="@+id/tvNombreDetalle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivFotoDetalle"
+                tools:text="GORRA TRIPLE BLACK EDITION" />
+
+            <!-- 3. Precio -->
+            <TextView
+                android:id="@+id/tvPrecioDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="22sp"
+                android:textStyle="italic"
+                android:textColor="@color/primary"
+                app:layout_constraintStart_toStartOf="@+id/tvNombreDetalle"
+                app:layout_constraintTop_toBottomOf="@+id/tvNombreDetalle"
+                tools:text="$1749.00 MXN" />
+
+            <!-- 4. Descripción -->
+            <TextView
+                android:id="@+id/tvDescripcion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="@+id/tvNombreDetalle"
+                app:layout_constraintStart_toStartOf="@+id/tvNombreDetalle"
+                app:layout_constraintTop_toBottomOf="@+id/tvPrecioDetalle"
+                tools:text="Aquí va la descripción detallada del producto. Usaremos este espacio para describir los materiales, la garantía y el ajuste." />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView> <!-- Cierre correcto del ScrollView -->
+
+    <!-- Botón Fijo (para el Módulo del Carrito) -->
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="@style/Widget.Material3.BottomAppBar"
+        android:backgroundTint="@color/softHats_light_blue">
+
+        <Button
+            android:id="@+id/btnAddCarrito"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Añadir al Carrito"
+            android:textSize="18sp"
+            android:backgroundTint="@color/primary" /> <!-- ¡Cierre corregido aquí! -->
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
