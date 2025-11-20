@@ -1,5 +1,6 @@
 package com.example.softhats
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,21 @@ class HomeActivity : AppCompatActivity() {
         // Inicializamos nuestra lista y adaptador
         gorraArrayList = ArrayList()
         gorraAdapter = GorraAdapter(this, gorraArrayList)
+
+        // --- 4. Define la acción de Clic ---
+        gorraAdapter.onItemClick = { gorraSeleccionada ->
+            // Creamos un Intent para ir a DetalleGorraActivity
+            val intent = Intent(this, DetalleGorraActivity::class.java)
+
+            // Pasamos los datos de la gorra a la siguiente Activity
+            intent.putExtra("EXTRA_NOMBRE", gorraSeleccionada.nombre)
+            intent.putExtra("EXTRA_PRECIO", gorraSeleccionada.precio)
+            intent.putExtra("EXTRA_DESCRIPCION", gorraSeleccionada.descripcion)
+            intent.putExtra("EXTRA_IMAGEN", gorraSeleccionada.imagen_nombre)
+
+            startActivity(intent)
+        }
+        // --- (Fin del bloque de clic) ---
 
         // Le decimos al RecyclerView que use nuestro adaptador
         recyclerView.adapter = gorraAdapter
