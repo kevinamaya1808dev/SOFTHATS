@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton // Importante: Importamos el botón flotante
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.ArrayList
 
@@ -19,7 +20,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Puedes mantener enableEdgeToEdge() si lo deseas, pero no es necesario para el catálogo
         setContentView(R.layout.activity_home)
 
         // --- 2. Inicializar Variables y Vistas ---
@@ -37,7 +37,19 @@ class HomeActivity : AppCompatActivity() {
         gorraArrayList = ArrayList()
         gorraAdapter = GorraAdapter(this, gorraArrayList)
 
-        // --- 4. Define la acción de Clic ---
+        // --- 3. CÓDIGO NUEVO: BOTÓN FLOTANTE DEL CARRITO ---
+        // Buscamos el botón por su ID (el que pusimos en el XML)
+        val fabCarrito = findViewById<FloatingActionButton>(R.id.fabVerCarrito)
+
+        // Le damos vida al clic
+        fabCarrito.setOnClickListener {
+            // Al hacer clic, nos lleva a la pantalla del CarritoActivity
+            val intent = Intent(this, CarritoActivity::class.java)
+            startActivity(intent)
+        }
+        // --------------------------------------------------
+
+        // --- 4. Define la acción de Clic en cada Gorra ---
         gorraAdapter.onItemClick = { gorraSeleccionada ->
             // Creamos un Intent para ir a DetalleGorraActivity
             val intent = Intent(this, DetalleGorraActivity::class.java)
@@ -55,11 +67,11 @@ class HomeActivity : AppCompatActivity() {
         // Le decimos al RecyclerView que use nuestro adaptador
         recyclerView.adapter = gorraAdapter
 
-        // --- 3. Llamar a la función que trae los datos ---
+        // --- 5. Llamar a la función que trae los datos ---
         getGorraData()
     }
 
-    // --- 4. La Función Mágica (Leer de Firestore) ---
+    // --- 6. La Función Mágica (Leer de Firestore) ---
     private fun getGorraData() {
 
         // Apuntamos a nuestra colección "gorras" en Firestore
