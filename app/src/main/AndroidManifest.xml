@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos requeridos -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SOFTHATS">
 
-        <!-- Pantalla principal: Login (la que se abre al iniciar la app) -->
+        <!-- Login principal -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -22,21 +27,13 @@
             </intent-filter>
         </activity>
 
-        <!-- Pantalla de Registro -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-
-        <!-- Pantalla de Perfil (la abriremos luego del login) -->
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-
-        <!-- Puedes dejar MainActivity si la vas a usar después -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
+        <activity android:name=".RegisterActivity" android:exported="false" />
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".MapsActivity" android:exported="true" />
+        <activity android:name=".DetalleGorraActivity" android:exported="false" />
     </application>
 
 </manifest>
+
