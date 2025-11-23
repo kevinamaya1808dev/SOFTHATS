@@ -54,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            startActivity(Intent(this, ProfileActivity::class.java))
+                            startActivity(Intent(this, HomeActivity::class.java)) // <-- ASÍ
                             finish()
                         } else {
                             Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -93,7 +93,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d("GOOGLE_AUTH", "Inicio de sesión correcto: ${account.displayName}")
-                    val intent = Intent(this, ProfileActivity::class.java)
+                    val intent = Intent(this, HomeActivity::class.java) // <-- ASÍ
                     intent.putExtra("user_name", account.displayName)
                     startActivity(intent)
                     finish()
@@ -110,7 +110,7 @@ class LoginActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             Log.d("GOOGLE_AUTH", "Sesión previa detectada: ${currentUser.email}")
-            val intent = Intent(this, ProfileActivity::class.java)
+            val intent = Intent(this, HomeActivity::class.java) // <-- ASÍ
             intent.putExtra("user_name", currentUser.displayName ?: currentUser.email)
             startActivity(intent)
             finish()
