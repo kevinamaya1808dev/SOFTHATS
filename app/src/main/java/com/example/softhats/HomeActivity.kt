@@ -2,100 +2,47 @@ package com.example.softhats
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton // Importante: Importamos el botón flotante
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.ArrayList
+import androidx.fragment.app.Fragment
+import com.example.softhats.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity() {
 
-    // --- 1. Declarar las Variables ---
-    private lateinit var db: FirebaseFirestore
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var gorraArrayList: ArrayList<Gorra>
-    private lateinit var gorraAdapter: GorraAdapter
+    private lateinit var binding: ActivityHomeBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // --- 2. Inicializar Variables y Vistas ---
+        // 1. Cargar el HomeFragment por defecto al abrir la app
+        // (Solo si es la primera vez que se abre, para no recargar si rotas la pantalla)
+        if (savedInstanceState == null) {
+            cambiarFragmento(HomeFragment())
+        }
 
-        // Conectamos el RecyclerView del XML con nuestra variable
-        recyclerView = findViewById(R.id.recyclerViewGorras)
+        // 2. Configurar los clics de la barra inferior (Bottom Navigation)
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> cambiarFragmento(HomeFragment())
+                R.id.nav_catalogo -> cambiarFragmento(CatalogoFragment())
+                R.id.nav_favoritos -> cambiarFragmento(FavoritosFragment())
+                R.id.nav_perfil -> cambiarFragmento(PerfilFragment())
+            }
+            true
+        }
 
-        // Le decimos que use el GridLayout de 2 columnas
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-
-        // Inicializamos la base de datos
-        db = FirebaseFirestore.getInstance()
-
-        // Inicializamos nuestra lista y adaptador
-        gorraArrayList = ArrayList()
-        gorraAdapter = GorraAdapter(this, gorraArrayList)
-
-        // --- 3. CÓDIGO NUEVO: BOTÓN FLOTANTE DEL CARRITO ---
-        // Buscamos el botón por su ID (el que pusimos en el XML)
-        val fabCarrito = findViewById<FloatingActionButton>(R.id.fabVerCarrito)
-
-        // Le damos vida al clic
-        fabCarrito.setOnClickListener {
-            // Al hacer clic, nos lleva a la pantalla del CarritoActivity
+        // 3. Configurar el botón del Carrito (el icono de arriba a la derecha)
+        binding.btnCarritoTop.setOnClickListener {
             val intent = Intent(this, CarritoActivity::class.java)
             startActivity(intent)
         }
-        // --------------------------------------------------
-
-        // --- 4. Define la acción de Clic en cada Gorra ---
-        gorraAdapter.onItemClick = { gorraSeleccionada ->
-            // Creamos un Intent para ir a DetalleGorraActivity
-            val intent = Intent(this, DetalleGorraActivity::class.java)
-
-            // Pasamos los datos de la gorra a la siguiente Activity
-            intent.putExtra("EXTRA_NOMBRE", gorraSeleccionada.nombre)
-            intent.putExtra("EXTRA_PRECIO", gorraSeleccionada.precio)
-            intent.putExtra("EXTRA_DESCRIPCION", gorraSeleccionada.descripcion)
-            intent.putExtra("EXTRA_IMAGEN", gorraSeleccionada.imagen_nombre)
-
-            startActivity(intent)
-        }
-        // --- (Fin del bloque de clic) ---
-
-        // Le decimos al RecyclerView que use nuestro adaptador
-        recyclerView.adapter = gorraAdapter
-
-        // --- 5. Llamar a la función que trae los datos ---
-        getGorraData()
     }
 
-    // --- 6. La Función Mágica (Leer de Firestore) ---
-    private fun getGorraData() {
-
-        // Apuntamos a nuestra colección "gorras" en Firestore
-        db.collection("gorras")
-            .get()
-            .addOnSuccessListener { result ->
-
-                // Limpiamos la lista
-                gorraArrayList.clear()
-
-                // Recorremos cada documento (gorra) que nos llegó
-                for (document in result) {
-                    // Convertimos el documento de Firebase en nuestro objeto "Gorra"
-                    val gorra = document.toObject(Gorra::class.java)
-                    gorraArrayList.add(gorra) // Añadimos la gorra a nuestra lista
-                }
-
-                // Le avisamos al adaptador que la lista cambió, para que redibuje
-                gorraAdapter.notifyDataSetChanged()
-
-            }
-            .addOnFailureListener { exception ->
-                // Si algo salió mal
-                Log.e("HomeActivity", "Error al obtener datos: ", exception)
-            }
+    // Función auxiliar para cambiar el contenido de la pantalla
+    private fun cambiarFragmento(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .commit()
     }
 }
