@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">SOFTHATS</string>
     <string name="default_web_client_id" translatable="false">1196016615547-lloodo1m13q1abb7qejppjer1oua0h7h.apps.googleusercontent.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

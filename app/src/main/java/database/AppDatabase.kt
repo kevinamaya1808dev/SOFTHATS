@@ -5,15 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-// ACTUALIZACIÓN: Agregamos CarritoEntity a la lista y subimos la versión a 2
-@Database(entities = [GorraEntity::class, CarritoEntity::class], version = 2)
+// IMPORTANTE: Subimos la versión a 3 y agregamos FavoritoEntity a la lista
+@Database(entities = [GorraEntity::class, CarritoEntity::class, FavoritoEntity::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
 
-    // DAOs existentes
     abstract fun gorraDao(): GorraDao
-
-    // NUEVO: DAO del Carrito
     abstract fun carritoDao(): CarritoDao
+    abstract fun favoritoDao(): FavoritoDao // Nuevo DAO
 
     companion object {
         @Volatile
@@ -26,9 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "hats_go_database"
                 )
-                    // Importante: Esto permite borrar la BD vieja y crear la nueva si cambias la versión
-                    // Evita errores mientras estás desarrollando y probando cambios.
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration() // Borra y crea nueva BD si cambia la versión
                     .build()
                 INSTANCE = instance
                 instance

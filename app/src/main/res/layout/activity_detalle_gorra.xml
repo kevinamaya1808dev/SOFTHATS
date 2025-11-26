@@ -15,11 +15,10 @@
         android:clipToPadding="false"
         android:paddingBottom="?attr/actionBarSize">
 
-        <!-- ESTE BLOQUE ES LA CLAVE: Aquí va el contenido del ScrollView -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="24dp">
+            android:paddingBottom="100dp">
 
             <!-- 1. Imagen de la Gorra -->
             <ImageView
@@ -30,7 +29,20 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
-            <!-- 2. Nombre -->
+            <!-- 2. Botón de Favorito (Corazón/Estrella) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabFavorito"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:src="@android:drawable/btn_star_big_off"
+                app:backgroundTint="@color/white"
+                app:tint="@null"
+                app:layout_constraintBottom_toBottomOf="@+id/ivFotoDetalle"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivFotoDetalle" />
+
+            <!-- 3. Nombre -->
             <TextView
                 android:id="@+id/tvNombreDetalle"
                 android:layout_width="0dp"
@@ -46,7 +58,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/ivFotoDetalle"
                 tools:text="GORRA TRIPLE BLACK EDITION" />
 
-            <!-- 3. Precio -->
+            <!-- 4. Precio -->
             <TextView
                 android:id="@+id/tvPrecioDetalle"
                 android:layout_width="wrap_content"
@@ -59,7 +71,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tvNombreDetalle"
                 tools:text="$1749.00 MXN" />
 
-            <!-- 4. Descripción -->
+            <!-- 5. Descripción -->
             <TextView
                 android:id="@+id/tvDescripcion"
                 android:layout_width="0dp"
@@ -70,28 +82,83 @@
                 app:layout_constraintEnd_toEndOf="@+id/tvNombreDetalle"
                 app:layout_constraintStart_toStartOf="@+id/tvNombreDetalle"
                 app:layout_constraintTop_toBottomOf="@+id/tvPrecioDetalle"
-                tools:text="Aquí va la descripción detallada del producto. Usaremos este espacio para describir los materiales, la garantía y el ajuste." />
+                tools:text="Aquí va la descripción detallada del producto..." />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.core.widget.NestedScrollView> <!-- Cierre correcto del ScrollView -->
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Botón Fijo (para el Módulo del Carrito) -->
+    <!-- BARRA INFERIOR CON CONTROLES (Misma lógica de cantidad que ya tenías) -->
     <com.google.android.material.bottomappbar.BottomAppBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        style="@style/Widget.Material3.BottomAppBar"
-        android:backgroundTint="@color/softHats_light_blue">
+        android:backgroundTint="@color/white"
+        android:padding="16dp">
 
-        <Button
-            android:id="@+id/btnAddCarrito"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="Añadir al Carrito"
-            android:textSize="18sp"
-            android:backgroundTint="@color/primary" /> <!-- ¡Cierre corregido aquí! -->
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- CONTADOR DE CANTIDAD (+ 1 -) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/ic_launcher_background"
+                android:backgroundTint="#F0F0F0"
+                android:layout_marginEnd="16dp"
+                android:padding="4dp">
+
+                <Button
+                    android:id="@+id/btnRestarDetalle"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="-"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:minWidth="0dp"
+                    style="?attr/borderlessButtonStyle"/>
+
+                <TextView
+                    android:id="@+id/tvCantidadDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_marginHorizontal="12dp"/>
+
+                <Button
+                    android:id="@+id/btnSumarDetalle"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="+"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"
+                    android:background="@android:color/transparent"
+                    android:padding="0dp"
+                    android:minWidth="0dp"
+                    style="?attr/borderlessButtonStyle"/>
+            </LinearLayout>
+
+            <!-- BOTÓN AÑADIR GRANDE -->
+            <Button
+                android:id="@+id/btnAddCarrito"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="Añadir al Carrito"
+                android:textSize="16sp"
+                android:backgroundTint="@color/primary" />
+
+        </LinearLayout>
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
