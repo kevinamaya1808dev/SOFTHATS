@@ -1,113 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/fondo_degradado"
-    android:fillViewport="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="32dp"
-        android:gravity="center_horizontal">
+        android:layout_height="match_parent"
+        android:background="@drawable/fondo_login">
 
-        <!-- Título principal -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Iniciar sesión"
-            android:textSize="28sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="24dp"/>
-
-        <!-- Campo de correo -->
-        <EditText
-            android:id="@+id/etEmail"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Correo electrónico"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="20dp"
-            android:textColorHint="@color/secondary"
-            android:layout_marginBottom="16dp"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/black"/>
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-        <!-- Campo de contraseña -->
-        <EditText
-            android:id="@+id/etContrasena"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Contraseña"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="20dp"
-            android:textColorHint="@color/secondary"
-            android:layout_marginBottom="24dp"
-            android:inputType="textPassword"
-            android:textColor="@color/black"/>
-
-        <!-- Botón principal -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Iniciar sesión"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/circulo_blanco"/>
-
-        <!-- Enlace de registro -->
-        <TextView
-            android:id="@+id/tvIrRegistro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¿No tienes cuenta? Regístrate"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp"/>
-
-        <!-- Separador -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="O continúa con"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Botón de Google -->
-        <LinearLayout
-            android:id="@+id/btnGoogleSignIn"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="16dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_google"
-                android:layout_marginEnd="10dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Iniciar sesión con Google"
-                android:textColor="@color/secondary"
-                android:textStyle="bold"/>
-        </LinearLayout>
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:padding="24dp">
 
-        <!-- Espaciador inferior -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="60dp" />
+                <!-- LOGO -->
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/icono"
+                    android:layout_marginTop="40dp"
+                    android:adjustViewBounds="true" />
 
-    </LinearLayout>
-</ScrollView>
+                <!-- TARJETA COMPLETA -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_login_unico"
+                    android:layout_marginTop="20dp"
+                    android:padding="20dp">
+
+                    <!-- INPUT CORREO -->
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:hint="Correo electrónico"
+                        android:background="@android:color/transparent"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@android:color/white"
+                        android:textColorHint="#D0D0D0"
+                        android:layout_marginBottom="16dp" />
+
+
+                    <!-- INPUT CONTRASEÑA CON BOTÓN MOSTRAR/OCULTAR -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="10dp">
+
+                        <EditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:hint="Contraseña"
+                            android:paddingHorizontal="16dp"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#D0D0D0"
+                            android:background="@android:color/transparent"
+                            android:inputType="textPassword" />
+
+                        <ImageView
+                            android:id="@+id/btnTogglePassword"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:padding="4dp"
+                            android:src="@drawable/ic_visibility_off"
+                            android:tint="@android:color/white" />
+                    </RelativeLayout>
+
+
+                    <!-- OLVIDASTE TU CONTRASEÑA -->
+                    <TextView
+                        android:id="@+id/tvForgotPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="¿Olvidaste tu contraseña?"
+                        android:textColor="#D0D0D0"
+                        android:textSize="14sp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- BOTÓN LOGIN -->
+                    <TextView
+                        android:id="@+id/btnLogin"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:gravity="center"
+                        android:text="Iniciar sesión"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:background="#505050"
+                        android:layout_marginBottom="20dp"
+                        android:padding="12dp" />
+
+                    <!-- SEPARADOR -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="10dp">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#80FFFFFF" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:background="@android:color/white"
+                            android:layout_marginHorizontal="12dp"
+                            android:layout_marginTop="3dp" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1"
+                            android:background="#80FFFFFF" />
+                    </LinearLayout>
+
+                    <!-- NO TIENES CUENTA -->
+                    <TextView
+                        android:id="@+id/tvIrRegistro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="¿No tienes cuenta? Regístrate"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- GOOGLE -->
+                    <ImageView
+                        android:id="@+id/btnGoogleSignIn"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ic_google"
+                        android:background="@android:color/white"
+                        android:padding="10dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="10dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </RelativeLayout>
+
+</layout>

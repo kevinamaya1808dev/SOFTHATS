@@ -2,7 +2,8 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:id="@+id/cardGorra"
+    android:layout_width="180dp"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
@@ -21,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:src="@android:drawable/ic_menu_gallery"/> <!-- Placeholder para ver algo en el editor -->
 
         <TextView
             android:id="@+id/tvNombreGorra"
@@ -31,6 +33,8 @@
             android:text="Nombre de la gorra"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="#000000" />
 
         <TextView
