@@ -8,36 +8,89 @@
     android:background="#F5F5F5"
     tools:context=".CatalogoFragment">
 
-    <!-- Título de la sección -->
     <TextView
         android:id="@+id/tvTituloCatalogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="4dp"
         android:text="Explora nuestra colección"
-        android:textSize="20sp"
-        android:textStyle="bold"
         android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- LA LISTA DE GORRAS (RecyclerView) -->
+    <LinearLayout
+        android:id="@+id/topBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/etSearchGorra"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_bar"
+            android:hint="Buscar gorras..."
+            android:textColorHint="#757575"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="10dp"
+            android:layout_marginEnd="12dp" />
+
+        <ImageButton
+            android:id="@+id/btnFilter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_filter_list"
+            android:padding="12dp"
+            app:tint="#333333" />
+
+        <ImageButton
+            android:id="@+id/btnSort"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_sort"
+            android:padding="12dp"
+            app:tint="#333333" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewGorras"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
         android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
         android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/topBarContainer"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_gorra" />
 
-    <!-- Barra de carga (opcional, para que se vea pro) -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

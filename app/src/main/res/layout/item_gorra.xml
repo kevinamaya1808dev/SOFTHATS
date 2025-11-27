@@ -2,50 +2,114 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardGorra"
     android:layout_width="180dp"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="16dp"
     app:cardElevation="6dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#E0E0E0">
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="12dp">
+
+        <ImageButton
+            android:id="@+id/btnFavoriteItem"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:elevation="2dp"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_favorite_border"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#000000" />
 
         <ImageView
             android:id="@+id/ivGorra"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:scaleType="centerCrop"
+            android:layout_height="140dp"
+            android:layout_marginTop="4dp"
             android:adjustViewBounds="true"
-            android:src="@android:drawable/ic_menu_gallery"/> <!-- Placeholder para ver algo en el editor -->
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnFavoriteItem"
+            tools:src="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/tvNombreGorra"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Nombre de la gorra"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="TRIPLE BLACK"
+            android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:textColor="#000000" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivGorra" />
+
+        <TextView
+            android:id="@+id/tvMarcaGorra"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="ThirtyOneHats"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNombreGorra" />
 
         <TextView
             android:id="@+id/tvPrecioGorra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="$0.00 MXN"
-            android:textSize="14sp"
-            android:textColor="#009688" />
+            android:layout_marginTop="12dp"
+            android:text="$ 1749.00"
+            android:textColor="#009688"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvMarcaGorra" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPrecioGorra"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvPrecioGorra">
+
+            <ImageButton
+                android:id="@+id/btnArCamera"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_camera_alt"
+                app:tint="#000000" />
+
+            <ImageButton
+                android:id="@+id/btnQuickAddCart"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                android:src="@drawable/ic_shopping_cart"
+                app:tint="#000000" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

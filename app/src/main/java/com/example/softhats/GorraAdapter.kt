@@ -4,28 +4,63 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 
-// DEFINICIÓN PRINCIPAL DEL ADAPTADOR (Módulo 2)
 class GorraAdapter(private val context: Context, private val gorraList: ArrayList<Gorra>) :
     RecyclerView.Adapter<GorraAdapter.GorraViewHolder>() {
 
-    // Declara una variable lambda para manejar el evento de clic fuera del adaptador
+    // --- NUEVO: COPIA DE SEGURIDAD PARA LA BÚSQUEDA ---
+    // Aquí guardamos TODAS las gorras para recuperarlas cuando borres el texto
+    private val gorraListOriginal = ArrayList<Gorra>()
+
+    // Función para guardar los datos originales la primera vez
+    fun actualizarDatosOriginales(nuevaLista: ArrayList<Gorra>) {
+        gorraListOriginal.clear()
+        gorraListOriginal.addAll(nuevaLista)
+        notifyDataSetChanged()
+    }
+
+    // --- NUEVO: FUNCIÓN DE FILTRADO ---
+    fun filtrar(texto: String) {
+        val textoBusqueda = texto.lowercase()
+        gorraList.clear()
+
+        if (textoBusqueda.isEmpty()) {
+            gorraList.addAll(gorraListOriginal)
+        } else {
+            for (gorra in gorraListOriginal) {
+                // --- AQUÍ ESTABA EL ERROR ---
+                // Agregamos (gorra.nombre ?: "") para evitar el null
+                if ((gorra.nombre ?: "").lowercase().contains(textoBusqueda)) {
+                    gorraList.add(gorra)
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
+
+    // --- EVENTOS DE CLIC (Lambdas) ---
     var onItemClick: ((Gorra) -> Unit)? = null
+    var onFavoriteClick: ((Gorra) -> Unit)? = null
+    var onCameraClick: ((Gorra) -> Unit)? = null
+    var onCartClick: ((Gorra) -> Unit)? = null
 
 // -------------------------------------------------------------------------------------------------
 
-    // 1. EL VIEWHOLDER (Debe existir solo una vez)
-    // Controla los elementos visuales de CADA fila (item_gorra.xml)
     inner class GorraViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivGorra: ImageView = itemView.findViewById(R.id.ivGorra)
         val tvNombreGorra: TextView = itemView.findViewById(R.id.tvNombreGorra)
         val tvPrecioGorra: TextView = itemView.findViewById(R.id.tvPrecioGorra)
+        val tvMarcaGorra: TextView = itemView.findViewById(R.id.tvMarcaGorra)
 
-        // Inicializador para el evento de clic (Lógica de Módulo 2)
+        val btnFavorite: ImageButton = itemView.findViewById(R.id.btnFavoriteItem)
+        val btnCamera: ImageButton = itemView.findViewById(R.id.btnArCamera)
+        val btnCart: ImageButton = itemView.findViewById(R.id.btnQuickAddCart)
+
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition
@@ -35,10 +70,7 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
             }
         }
     }
-// -------------------------------------------------------------------------------------------------
 
-    // 2. ON CREATE VIEWHOLDER
-    // Dibuja el XML de la fila (item_gorra.xml)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GorraViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(
             R.layout.item_gorra,
@@ -47,22 +79,17 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         return GorraViewHolder(itemView)
     }
 
-    // 3. GET ITEM COUNT
-    // Le dice al RecyclerView cuántos items (gorras) hay en la lista
     override fun getItemCount(): Int {
         return gorraList.size
     }
 
-    // 4. ON BIND VIEWHOLDER
-    // Conecta los datos con el ViewHolder
     override fun onBindViewHolder(holder: GorraViewHolder, position: Int) {
         val currentGorra = gorraList[position]
 
-        // Conecta los datos con las vistas
         holder.tvNombreGorra.text = currentGorra.nombre
         holder.tvPrecioGorra.text = "$ ${currentGorra.precio}"
+        holder.tvMarcaGorra.text = "ThirtyOneHats"
 
-        // Lógica para la imagen (de String a @drawable)
         val imageName = currentGorra.imagen_nombre
         val resourceId = context.resources.getIdentifier(
             imageName, "drawable", context.packageName
@@ -71,7 +98,11 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         if (resourceId != 0) {
             holder.ivGorra.setImageResource(resourceId)
         } else {
-            Log.w("GorraAdapter", "No se encontró la imagen: $imageName")
+            // holder.ivGorra.setImageResource(R.drawable.placeholder_gorra)
         }
+
+        holder.btnFavorite.setOnClickListener { onFavoriteClick?.invoke(currentGorra) }
+        holder.btnCamera.setOnClickListener { onCameraClick?.invoke(currentGorra) }
+        holder.btnCart.setOnClickListener { onCartClick?.invoke(currentGorra) }
     }
 }
