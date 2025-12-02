@@ -37,6 +37,13 @@ class HomeActivity : AppCompatActivity() {
             val intent = Intent(this, CarritoActivity::class.java)
             startActivity(intent)
         }
+
+        //Boton de mapa
+        binding.btnMapa.setOnClickListener {
+            val intent = Intent(this, MapsActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     // Función auxiliar para cambiar el contenido de la pantalla

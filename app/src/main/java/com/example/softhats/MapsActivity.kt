@@ -40,25 +40,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        val spaceNeedle = LatLng(47.6205, -122.3493)
+        val tescha = LatLng(19.262347, -98.896168)
 
         val marker = MarkerOptions()
-            .position(spaceNeedle)
-            .title("Space Needle")
-            .snippet("400 Broad St, Seattle, WA 98109, USA")
+            .position(tescha)
+            .title("Sucursal Principal HatsGo")
+            .snippet("TESCHA - Carretera México-Cuautla Km 38+100, Chalco, Edo. de México")
 
         mMap.addMarker(marker)
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(spaceNeedle, 16f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tescha, 17f))
 
-        mMap.animateCamera(CameraUpdateFactory.zoomIn())
+        mMap.setOnMarkerClickListener { marker ->
+            marker.showInfoWindow()
+            true
+        }
 
-        mMap.setOnMapClickListener { latLng ->
-            mMap.clear()
-            mMap.addMarker(MarkerOptions().position(latLng).title("Nuevo marcador"))
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
-            mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
-
+        mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
         }
     }
-}
