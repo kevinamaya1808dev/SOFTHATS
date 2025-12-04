@@ -17,16 +17,18 @@
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Icono de Usuario (Izquierda) -->
         <ImageView
-            android:id="@+id/imgUser"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@android:drawable/ic_menu_my_calendar"
+            android:id="@+id/btnMapa"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_menu_mapmode"
+            android:contentDescription="Abrir mapa TESCHA"
+            app:tint="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:tint="@color/black"/>
+            android:clickable="true"
+            android:focusable="true" />
 
         <!-- Título Central -->
         <TextView

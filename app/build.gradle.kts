@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("kotlin-kapt") // <--- AGREGA ESTA LÍNEA
+    id("kotlin-kapt")
 }
 
 android {
@@ -28,7 +28,6 @@ android {
         }
     }
 
-    // 🔹 HABILITAR ViewBinding (requerido para ActivityLoginBinding y ActivityRegisterBinding)
     buildFeatures {
         viewBinding = true
     }
@@ -66,7 +65,6 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.androidx.activity)
 
-
     // 🔹 Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -75,6 +73,10 @@ dependencies {
     // --- ROOM DATABASE (Módulo 3) ---
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version") // Para usar Corrutinas fácil
+    implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+
+    // --- SERVICIOS DE MAPS ---
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
