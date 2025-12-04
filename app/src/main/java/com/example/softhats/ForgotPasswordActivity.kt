@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 class ForgotPasswordActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-
+    // Commit para habilitar el Pull Request
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
