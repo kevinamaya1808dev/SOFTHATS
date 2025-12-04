@@ -36,7 +36,7 @@ class CarritoActivity : AppCompatActivity() {
         // 3. Observar los datos del carrito en tiempo real
         observarCarrito()
 
-        // 4. Botón Pagar/Cerrar Venta (MODIFICADO para WhatsApp)
+        // 4. Botón Pagar/Cerrar Venta (Mantiene la funcionalidad de WhatsApp)
         binding.btnPagar.setOnClickListener {
             // Llama a la función para obtener el resumen y enviar a WhatsApp
             enviarPedidoWhatsAppConResumen()
@@ -212,5 +212,4 @@ class CarritoActivity : AppCompatActivity() {
             Toast.makeText(this, "Ocurrió un error al intentar abrir la aplicación.", Toast.LENGTH_LONG).show()
         }
     }
-    // --------------------------------------------------------------------------------
 }

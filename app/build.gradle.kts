@@ -2,13 +2,17 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+ feature/modulo5-Checkout
 
     id("kotlin-kapt")
+
+    id("kotlin-kapt") // <--- AGREGA ESTA LÍNEA
+ main
 }
 
 android {
     namespace = "com.example.softhats"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.softhats"
@@ -47,6 +51,8 @@ android {
 dependencies {
     // 🔹 Firebase BoM (maneja versiones automáticamente)
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+
+    // --- DEPENDENCIAS DE FIREBASE
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
@@ -59,9 +65,12 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.androidx.activity)
+
 
     implementation(libs.androidx.activity)
 
@@ -73,4 +82,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+    // --- ROOM DATABASE (Módulo 3) ---
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version") // Para usar Corrutinas fácil
+    kapt("androidx.room:room-compiler:$room_version")
 }
