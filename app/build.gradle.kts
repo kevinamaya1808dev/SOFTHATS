@@ -2,6 +2,10 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+<<<<<<< Updated upstream
+=======
+    id("kotlin-kapt")
+>>>>>>> Stashed changes
 }
 
 android {
@@ -60,6 +64,13 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+<<<<<<< Updated upstream
+=======
+    implementation(libs.androidx.activity)
+
+    // 🚩🚩 NUEVA DEPENDENCIA PARA LEER JSON DEL CARRITO (SharedPreferences) 🚩🚩
+    implementation("com.google.code.gson:gson:2.10.1")
+>>>>>>> Stashed changes
 
     // 🔹 Testing
     testImplementation("junit:junit:4.13.2")
