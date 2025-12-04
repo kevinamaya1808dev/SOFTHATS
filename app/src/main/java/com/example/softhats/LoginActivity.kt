@@ -46,11 +46,12 @@ class LoginActivity : AppCompatActivity() {
         binding.tvForgotPassword.setOnClickListener {
             startActivity(Intent(this, ForgotPasswordActivity::class.java))
         }
-        // Commit para habilitar el Pull Request
-        // 🔹 Mostrar / ocultar contraseña
+
         binding.btnTogglePassword.setOnClickListener {
             togglePasswordVisibility()
         }
+        // Commit para habilitar el Pull Request
+
 
         // 🔹 Login normal
         binding.btnLogin.setOnClickListener {
