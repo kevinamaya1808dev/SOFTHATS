@@ -23,7 +23,7 @@
             android:layout_height="160dp"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
-            android:src="@android:drawable/ic_menu_gallery"/> <!-- Placeholder para ver algo en el editor -->
+            android:src="@android:drawable/ic_menu_gallery"/>
 
         <TextView
             android:id="@+id/tvNombreGorra"
@@ -46,6 +46,32 @@
             android:textSize="14sp"
             android:textColor="#009688" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="4dp"/>
+
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnFavorito"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_favorite_border"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#000000" />
+
+    <ImageButton
+        android:id="@+id/btnCarrito"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_shopping_cart"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="#000000" />
 
 </com.google.android.material.card.MaterialCardView>
