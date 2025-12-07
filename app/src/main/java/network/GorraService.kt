@@ -1,16 +1,21 @@
 package com.example.softhats.network
 
 import android.content.Context
+import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.GorraEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 
 class GorraService(private val context: Context) {
 
-    fun obtenerGorras(
+    fun obtenerYGuardarGorras(
         onSuccess: (List<GorraEntity>) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -34,6 +39,15 @@ class GorraService(private val context: Context) {
                         )
                     )
                 }
+
+                // 🔹 GUARDAR EN ROOM (Módulo 3)
+                CoroutineScope(Dispatchers.IO).launch {
+                    val db = AppDatabase.getDatabase(context)
+                    db.gorraDao().borrarTodo()
+                    db.gorraDao().insertarTodas(lista)
+                }
+
+                Toast.makeText(context, "Datos actualizados desde servidor", Toast.LENGTH_SHORT).show()
                 onSuccess(lista)
             },
             { error ->
