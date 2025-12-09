@@ -3,7 +3,7 @@ package com.example.softhats
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -11,10 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.CarritoEntity
 import com.example.softhats.databinding.ActivityCarritoBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
-import java.util.Locale
+import java.io.OutputStreamWriter
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class CarritoActivity : AppCompatActivity() {
 
@@ -22,33 +26,44 @@ class CarritoActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
     private lateinit var adapter: CarritoAdapter
 
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inflar el layout con ViewBinding
         binding = ActivityCarritoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. Inicializar Base de Datos
+        // Inicializar la base de datos local Room
         database = AppDatabase.getDatabase(this)
 
-        // 2. Configurar el RecyclerView (Lista)
+        // Configurar el RecyclerView del carrito
         setupRecyclerView()
 
-        // 3. Observar los datos del carrito en tiempo real
+        // Observar los cambios de productos en Room
         observarCarrito()
 
-        // 4. Botón Pagar/Cerrar Venta (Mantiene la funcionalidad de WhatsApp)
+        // Botón que solo genera el archivo TXT del ticket
+        binding.btnGenerarTicket.setOnClickListener {
+            generarTicket()
+        }
+
+        // Botón que genera ticket + lo envía a Firestore + WhatsApp
         binding.btnPagar.setOnClickListener {
-            // Llama a la función para obtener el resumen y enviar a WhatsApp
-            enviarPedidoWhatsAppConResumen()
+            generarTicketYEnviar()
         }
     }
 
+    // ------------------------------------------------------------
+
+
     private fun setupRecyclerView() {
-        // Inicializamos el adaptador con las acciones para cada botón
         adapter = CarritoAdapter(
-            onSumarClick = { item -> actualizarCantidad(item, 1) },
-            onRestarClick = { item -> actualizarCantidad(item, -1) },
-            onEliminarClick = { item -> eliminarItem(item) }
+            onSumarClick = { actualizarCantidad(it, 1) },
+            onRestarClick = { actualizarCantidad(it, -1) },
+            onEliminarClick = { eliminarItem(it) }
         )
 
         binding.rvCarrito.layoutManager = LinearLayoutManager(this)
@@ -56,48 +71,34 @@ class CarritoActivity : AppCompatActivity() {
     }
 
     private fun observarCarrito() {
-        // Usamos Flow para recibir actualizaciones automáticas si algo cambia en la BD
         lifecycleScope.launch {
             database.carritoDao().obtenerCarrito().collect { items ->
-                // Actualizamos la lista visual
                 adapter.submitList(items)
-
-                // Calculamos y mostramos el total
                 actualizarTotal(items)
 
-                // Mostrar u ocultar mensaje de "Vacío"
-                binding.tvVacio.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
-                binding.rvCarrito.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+                binding.tvVacio.visibility =
+                    if (items.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
             }
         }
     }
 
     private fun actualizarTotal(items: List<CarritoEntity>) {
-        var granTotal = 0.0
-        for (item in items) {
-            granTotal += item.total
-        }
-        binding.tvGranTotal.text = "$ ${String.format(Locale.getDefault(), "%,.2f", granTotal)}"
+        val total = items.sumOf { it.total }
+        binding.tvGranTotal.text = "$ ${String.format("%,.2f", total)}"
     }
-
-    // --- LÓGICA DE LOS BOTONES ---
 
     private fun actualizarCantidad(item: CarritoEntity, cambio: Int) {
         val nuevaCantidad = item.cantidad + cambio
 
         if (nuevaCantidad > 0) {
-            // Actualizamos cantidad y recalcula el subtotal
-            val itemActualizado = item.copy(
+            val actualizado = item.copy(
                 cantidad = nuevaCantidad,
-                total = item.precioUnitario * nuevaCantidad
+                total = nuevaCantidad * item.precioUnitario
             )
             lifecycleScope.launch {
-                database.carritoDao().insertarOActualizar(itemActualizado)
+                database.carritoDao().insertarOActualizar(actualizado)
             }
-        } else {
-            // Si la cantidad llega a 0, eliminamos directo
-            eliminarItem(item)
-        }
+        } else eliminarItem(item)
     }
 
     private fun eliminarItem(item: CarritoEntity) {
@@ -107,109 +108,168 @@ class CarritoActivity : AppCompatActivity() {
         }
     }
 
-    // --------------------------------------------------------------------------------
-    // 🚩🚩 FUNCIÓN 1 DE 2: LECTURA DEL CARRITO Y ENVÍO A WHATSAPP 🚩🚩
-    // --------------------------------------------------------------------------------
-
-    private fun enviarPedidoWhatsAppConResumen() {
+    // ------------------------------------------------------------
+// 🟡 SOLO GENERA EL ARCHIVO TXT DEL TICKET (sin enviar)
+// ------------------------------------------------------------
+    private fun generarTicket() {
         lifecycleScope.launch {
-            // 1. Obtener la lista actual de artículos del carrito usando .first()
-            val items = database.carritoDao().obtenerCarrito().first()
 
-            if (items.isEmpty()) {
-                Toast.makeText(this@CarritoActivity, "El carrito está vacío para enviar el pedido.", Toast.LENGTH_SHORT).show()
+            // 1️⃣ Obtener carrito desde Room
+            val carrito = database.carritoDao().obtenerCarrito().first()
+            if (carrito.isEmpty()) {
+                Toast.makeText(this@CarritoActivity, "El carrito está vacío", Toast.LENGTH_SHORT).show()
                 return@launch
             }
 
-            Toast.makeText(this@CarritoActivity, "Generando pedido y abriendo WhatsApp...", Toast.LENGTH_LONG).show()
+            // 2️⃣ Obtener fecha para el nombre del archivo
+            val fecha = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+            val nombreArchivo = "ticket_compra_${fecha}.txt"
 
-            // 2. Procesar los artículos para generar el mensaje
-            val mensajeArticulos = StringBuilder()
-            var totalVenta = 0.0
-            val nombreCliente = "Cliente SOFTHATS"
+            // 3️⃣ Construir texto del ticket (sin datos del usuario)
+            val sb = StringBuilder()
+            sb.appendLine("----- TICKET DE COMPRA HATSGO -----")
+            sb.appendLine("Fecha: $fecha")
+            sb.appendLine("------------------------------------")
+            sb.appendLine("PRODUCTOS:")
 
-            for (item in items) {
-                totalVenta += item.total
-
-                // Construir la línea del artículo
-                mensajeArticulos.append(
-                    String.format(
-                        Locale.getDefault(),
-                        "- %d x %s ($%.2f c/u)\n",
-                        item.cantidad,
-                        item.nombre,
-                        item.precioUnitario
-                    )
-                )
+            var total = 0.0
+            carrito.forEach {
+                sb.appendLine("${it.cantidad}x ${it.nombre} - $${it.total}")
+                total += it.total
             }
 
-            // 3. Llamar a la función que lanza WhatsApp
-            lanzarWhatsApp(nombreCliente, mensajeArticulos.toString(), totalVenta)
+            sb.appendLine("------------------------------------")
+            sb.appendLine("TOTAL A PAGAR: $$total")
+            sb.appendLine("------------------------------------")
+
+            val contenido = sb.toString()
+
+            // 4️⃣ Guardar archivo interno en la app
+            guardarArchivoInterno(nombreArchivo, contenido)
+
+            Toast.makeText(
+                this@CarritoActivity,
+                "Ticket generado: $nombreArchivo",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
 
-    // --------------------------------------------------------------------------------
-    // 🚩🚩 FUNCIÓN 2 DE 2: ENSAMBLAR MENSAJE Y ABRIR WHATSAPP 🚩🚩
-    // --------------------------------------------------------------------------------
+    // ------------------------------------------------------------
+    // 🟢 GENERAR TICKET Y ENVIAR A WHATSAPP
+    // ------------------------------------------------------------
+    private fun generarTicketYEnviar() {
+        lifecycleScope.launch {
 
-    private fun lanzarWhatsApp(
-        nombreCliente: String,
-        detalleArticulos: String,
-        totalVenta: Double
-    ) {
-        // 🚨 AJUSTA ESTE NÚMERO POR EL TELÉFONO DE SOFTHATS (Código de país + número, sin '+') 🚨
-        val numeroEmpresa = "525626350435"
+            val carrito = database.carritoDao().obtenerCarrito().first()
+            if (carrito.isEmpty()) {
+                Toast.makeText(this@CarritoActivity, "El carrito está vacío", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
 
-        val plantillaMensaje = """
-            *--- Pedido SOFTHATS (Cierre de Venta) ---*
-            
-            Hola, %s.
-            
-            Hemos generado tu resumen de pedido, por favor confírmalo:
-            
-            *Artículos:*
-            %s
-            
-            *Total del Pedido: $%.2f Mxm*
-            
-            Para completar la compra, por favor responde indicando tu método de pago preferido (Transferencia o Deposito).
-            ¡Gracias por elegir a SOFTHATS!
-        """.trimIndent()
+            val uid = auth.currentUser?.uid
+            if (uid == null) {
+                Toast.makeText(this@CarritoActivity, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
 
-        val mensajeFinal = String.format(
-            Locale.getDefault(),
-            plantillaMensaje,
-            nombreCliente,
-            detalleArticulos,
-            totalVenta
+            firestore.collection("usuarios").document(uid).get()
+                .addOnSuccessListener { doc ->
+
+                    if (!doc.exists()) {
+                        Toast.makeText(this@CarritoActivity, "El documento no existe en Firestore", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
+                    }
+
+                    val nombre = doc.getString("nombre") ?: "Cliente"
+                    val telefono = doc.getString("telefono") ?: "N/A"
+
+                    Log.d("FIRESTORE_DATA", "Nombre Firestore: $nombre")
+                    Log.d("FIRESTORE_DATA", "Teléfono Firestore: $telefono")
+
+                    val fecha = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+                    val nombreArchivo = "ticket_compra_${fecha}.txt"
+
+                    val textoTicket = construirTicketTexto(fecha, nombre, telefono, carrito)
+                    guardarArchivoInterno(nombreArchivo, textoTicket)
+
+                    enviarWhatsApp(textoTicket)
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this@CarritoActivity, "Error al obtener usuario Firestore", Toast.LENGTH_LONG).show()
+
+                }
+
+
+        }
+    }
+
+    private fun construirTicketTexto(
+        fecha: String,
+        nombre: String,
+        telefono: String,
+        carrito: List<CarritoEntity>
+    ): String {
+
+        val sb = StringBuilder()
+
+        sb.appendLine("----- TICKET DE COMPRA HATSGO -----")
+        sb.appendLine("Fecha: $fecha")
+        sb.appendLine("Cliente: $nombre")
+        sb.appendLine("Teléfono: $telefono")
+        sb.appendLine("-----------------------------------")
+        sb.appendLine("PRODUCTOS:")
+
+        var total = 0.0
+
+        carrito.forEach {
+            sb.appendLine("${it.cantidad}x ${it.nombre} - $${it.total}")
+            total += it.total
+        }
+
+        sb.appendLine("-----------------------------------")
+        sb.appendLine("TOTAL A PAGAR: $$total")
+        sb.appendLine("-----------------------------------")
+        sb.appendLine("Estado: Pendiente de pago")
+        sb.appendLine("-----------------------------------")
+
+        return sb.toString()
+    }
+
+    private fun guardarArchivoInterno(nombre: String, contenido: String) {
+        try {
+            val outputStream = openFileOutput(nombre, MODE_PRIVATE)
+            val writer = OutputStreamWriter(outputStream)
+            writer.write(contenido)
+            writer.close()
+
+            Log.d("TICKET", "Archivo guardado: $filesDir/$nombre")
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error guardando ticket", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun enviarWhatsApp(ticket: String) {
+
+        val numero = "525626350435"
+
+        val uri = Uri.parse(
+            "https://wa.me/$numero?text=" + Uri.encode(ticket)
         )
 
-        try {
-            // Codificar el mensaje para la URL
-            val mensajeCodificado = URLEncoder.encode(mensajeFinal, "UTF-8")
-            val uri = Uri.parse("https://wa.me/$numeroEmpresa?text=$mensajeCodificado")
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        intent.setPackage("com.whatsapp")
 
-            // 1. Crear el Intent de vista (ACTION_VIEW)
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-
-            // 2. 🔑 SOLUCIÓN: FORZAR EL INTENT A USAR EL PAQUETE DE WHATSAPP ESTÁNDAR 🔑
-            intent.setPackage("com.whatsapp")
-
-            // 3. Verificar y lanzar
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                // Si falla al forzar el paquete, intentar con el método genérico
-                val fallbackIntent = Intent(Intent.ACTION_VIEW, uri)
-                if (fallbackIntent.resolveActivity(packageManager) != null) {
-                    startActivity(fallbackIntent)
-                } else {
-                    Toast.makeText(this, "WhatsApp no está instalado.", Toast.LENGTH_LONG).show()
-                }
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Ocurrió un error al intentar abrir la aplicación.", Toast.LENGTH_LONG).show()
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        } else {
+            startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
     }
 }
+
+
+
+
