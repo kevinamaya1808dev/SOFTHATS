@@ -1,17 +1,26 @@
 package com.example.softhats
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.softhats.database.AppDatabase
+import com.example.softhats.database.CarritoEntity
 import com.example.softhats.database.FavoritoEntity
 import com.example.softhats.databinding.ItemGorraBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoViewHolder>(DiffCallback) {
 
-    // 1. Variable para guardar la acción de clic (El "Cable")
+    // Variable para guardar la acción de clic (Ir a detalles)
     var onItemClick: ((FavoritoEntity) -> Unit)? = null
 
     companion object DiffCallback : DiffUtil.ItemCallback<FavoritoEntity>() {
@@ -25,9 +34,11 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
     }
 
     class FavoritoViewHolder(private val binding: ItemGorraBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(favorito: FavoritoEntity, clickListener: ((FavoritoEntity) -> Unit)?) {
-            // Datos visuales
+            // 1. Datos visuales
             binding.tvNombreGorra.text = favorito.nombre
+            // Asumiendo que favorito.precio ya es Double, lo formateamos bonito
             binding.tvPrecioGorra.text = "$ ${String.format(Locale.getDefault(), "%,.2f", favorito.precio)}"
 
             if (favorito.imagenNombre.isNotEmpty()) {
@@ -35,12 +46,60 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
                 val resourceId = context.resources.getIdentifier(favorito.imagenNombre, "drawable", context.packageName)
                 if (resourceId != 0) {
                     binding.ivGorra.setImageResource(resourceId)
+                } else {
+                    binding.ivGorra.setImageResource(R.drawable.ic_launcher_foreground)
                 }
             }
 
-            // 2. Configurar el clic: Cuando toquen la tarjeta, avisamos
+            // 2. Clic en la tarjeta completa (Para ver detalles)
             itemView.setOnClickListener {
                 clickListener?.invoke(favorito)
+            }
+
+            // ---------------------------------------------------------------
+            // 3. NUEVO CÓDIGO: Clic en el botón del carrito (btnCarrito)
+            // ---------------------------------------------------------------
+            binding.btnCarrito.setOnClickListener {
+                val context = binding.root.context
+                val cantidadInicial = 1
+
+                // Creamos el objeto para el carrito basándonos en el favorito
+                val productoParaCarrito = CarritoEntity(
+                    // Usamos hashcode del nombre para que coincida con el catálogo si es la misma gorra
+                    idProducto = favorito.nombre.hashCode(),
+                    nombre = favorito.nombre,
+                    precioUnitario = favorito.precio,
+                    cantidad = cantidadInicial,
+                    total = favorito.precio * cantidadInicial
+                )
+
+                // Usamos Corrutinas para guardar en BD (Igual que en GorraAdapter)
+                val scope = (context as? LifecycleOwner)?.lifecycleScope
+                    ?: kotlinx.coroutines.GlobalScope
+
+                scope.launch(Dispatchers.IO) {
+                    try {
+                        // Conexión a la BD
+                        val db = AppDatabase.getDatabase(context)
+
+                        // Guardar
+                        db.carritoDao().insertarOActualizar(productoParaCarrito)
+
+                        // Avisar al usuario
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                context,
+                                "Agregado desde Favoritos: ${favorito.nombre}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Log.e("FavoritosAdapter", "Error DB: ${e.message}")
+                        }
+                    }
+                }
             }
         }
     }
@@ -52,7 +111,6 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
 
     override fun onBindViewHolder(holder: FavoritoViewHolder, position: Int) {
         val favorito = getItem(position)
-        // 3. Pasamos el listener al ViewHolder
         holder.bind(favorito, onItemClick)
     }
 }
