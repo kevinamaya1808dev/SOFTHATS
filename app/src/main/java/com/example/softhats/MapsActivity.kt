@@ -40,7 +40,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        val tescha = LatLng(19.262347, -98.896168)
+        val tescha = LatLng(19.2324377, -98.8442159)
 
         val marker = MarkerOptions()
             .position(tescha)
