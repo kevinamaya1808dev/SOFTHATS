@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("kotlin-kapt")
+    id("kotlin-kapt") // Necesario para Glide y Room
 }
 
 android {
@@ -18,6 +18,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,10 +30,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-
-    buildFeatures {
-        viewBinding = true
     }
 
     compileOptions {
@@ -43,43 +43,46 @@ android {
 }
 
 dependencies {
-    // 🔹 Firebase BoM (maneja versiones automáticamente)
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
 
-    // --- DEPENDENCIAS DE FIREBASE
+    // ------------------ FIREBASE ------------------
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
 
-    // 🔹 Google Sign-In
+    // ------------------ GOOGLE SIGN IN ------------------
     implementation("com.google.android.gms:play-services-auth:21.1.0")
 
-    // 🔹 AndroidX + Material
+    // ------------------ GLIDE ------------------
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // ------------------ ANDROIDX ------------------
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
+    // ------------------ CREDENTIALS API ------------------
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
-    implementation(libs.androidx.activity)
 
-    // 🔹 Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    // ------------------ MAPS & LOCATION ------------------
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.android.volley:volley:1.2.1") // <-- Add this line
 
-    // --- ROOM DATABASE (Módulo 3) ---
+
+    // ------------------ ROOM ------------------
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
-    // --- SERVICIOS DE MAPS ---
-    implementation("com.google.android.gms:play-services-maps:18.1.0")
-    implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.android.volley:volley:1.2.1")
-
-
+    // ------------------ TESTING ------------------
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
