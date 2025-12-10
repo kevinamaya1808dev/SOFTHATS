@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Spinner de ladas con banderas (texto con emojis) -->
+    <string-array name="ladas">
+        <item>🇲🇽 +52</item>
+        <item>🇺🇸 +1</item>
+        <item>🇨🇱 +56</item>
+        <item>🇦🇷 +54</item>
+    </string-array>
+
+</resources>

@@ -2,12 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- Cabecera negra de fondo -->
+    <!-- Cabecera negra -->
     <View
         android:id="@+id/headerBg"
         android:layout_width="match_parent"
@@ -15,7 +14,7 @@
         android:background="@color/black"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Tarjeta con Foto de Perfil -->
+    <!-- Foto de Perfil -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardProfile"
         android:layout_width="120dp"
@@ -23,44 +22,83 @@
         android:layout_marginTop="120dp"
         app:cardCornerRadius="60dp"
         app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/ivUserProfile"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/sym_def_app_icon"
-            app:tint="#555555" />
+            android:src="@drawable/ic_user_placeholder" />
     </androidx.cardview.widget.CardView>
 
-    <!-- Correo del Usuario -->
+    <!-- Botón para cambiar foto -->
+    <ImageView
+        android:id="@+id/btnChangePhoto"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_camera"
+        android:padding="6dp"
+        android:background="@drawable/bg_circle_white"
+        app:layout_constraintTop_toBottomOf="@id/cardProfile"
+        app:layout_constraintStart_toEndOf="@id/cardProfile"
+        android:layout_marginStart="-40dp"
+        android:layout_marginTop="-40dp"/>
+
+    <!-- NOMBRE / CORREO -->
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cargando..."
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/cardProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
     <TextView
         android:id="@+id/tvUserEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Cargando usuario..."
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardProfile" />
-
-    <!-- Etiqueta pequeña -->
-    <TextView
-        android:id="@+id/tvUserLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Miembro Softhats"
         android:textColor="#757575"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvUserName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUserEmail" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Mensaje si inició con Google -->
+    <TextView
+        android:id="@+id/tvGoogleIncomplete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tu cuenta de Google no tiene todos los datos. Complétalos."
+        android:textColor="#D32F2F"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvUserEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="6dp"/>
+
+    <!-- Botón Editar Perfil -->
+    <Button
+        android:id="@+id/btnEditUser"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Editar perfil"
+        android:backgroundTint="#2196F3"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="32dp"
+        app:layout_constraintTop_toBottomOf="@id/tvGoogleIncomplete"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"/>
 
     <!-- Botón Cerrar Sesión -->
     <Button
@@ -73,9 +111,9 @@
         android:text="Cerrar Sesión"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:cornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
