@@ -215,9 +215,9 @@ class CarritoActivity : AppCompatActivity() {
         val sb = StringBuilder()
 
         sb.appendLine("----- TICKET DE COMPRA HATSGO -----")
-        sb.appendLine("Fecha: $fecha")
-        sb.appendLine("Cliente: $nombre")
-        sb.appendLine("Teléfono: $telefono")
+        sb.appendLine("FECHA: $fecha")
+        sb.appendLine("CLIENTE: $nombre")
+        sb.appendLine("TELÉFONO: $telefono")
         sb.appendLine("-----------------------------------")
         sb.appendLine("PRODUCTOS:")
 
@@ -231,7 +231,7 @@ class CarritoActivity : AppCompatActivity() {
         sb.appendLine("-----------------------------------")
         sb.appendLine("TOTAL A PAGAR: $$total")
         sb.appendLine("-----------------------------------")
-        sb.appendLine("Estado: Pendiente de pago")
+        sb.appendLine("ESTADO: Pendiente de pago")
         sb.appendLine("-----------------------------------")
 
         return sb.toString()
