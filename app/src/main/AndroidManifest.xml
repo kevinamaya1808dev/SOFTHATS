@@ -54,5 +54,9 @@
             android:name=".MapsActivity"
             android:exported="true" />
     </application>
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+    </queries>
 
 </manifest>
