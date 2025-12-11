@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.softhats"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.softhats"
@@ -64,22 +64,24 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
+    // ------------------ MAPS & LOCATION ------------------
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.android.volley:volley:1.2.1")
+
     // ------------------ CREDENTIALS API ------------------
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
-
-    // ------------------ MAPS & LOCATION ------------------
-    implementation("com.google.android.gms:play-services-maps:18.1.0")
-    implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.android.volley:volley:1.2.1") // <-- Add this line
-
 
     // ------------------ ROOM ------------------
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+
+    // ------------------ GSON ------------------
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // ------------------ TESTING ------------------
     testImplementation("junit:junit:4.13.2")
