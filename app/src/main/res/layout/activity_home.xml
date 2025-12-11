@@ -17,6 +17,7 @@
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent">
 
+        <!-- BOTÓN IZQUIERDO: MAPA -->
         <ImageView
             android:id="@+id/btnMapa"
             android:layout_width="36dp"
@@ -44,21 +45,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <!-- Botón del Carrito (Derecha) -->
-        <!-- Este reemplaza a tu antiguo botón flotante -->
+        <!-- BOTÓN DERECHO: CARRITO (Antes era el ojo) -->
+        <!-- CAMBIO: Se actualizó src para usar ic_shopping_cart -->
         <ImageView
             android:id="@+id/btnCarritoTop"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@android:drawable/ic_menu_view"
+            android:src="@drawable/ic_shopping_cart"
             app:tint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:clickable="true"
+            android:focusable="true"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 2. CONTENEDOR DE FRAGMENTOS (Aquí cambia el contenido: Home, Catálogo, etc.) -->
+    <!-- 2. CONTENEDOR DE FRAGMENTOS -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"

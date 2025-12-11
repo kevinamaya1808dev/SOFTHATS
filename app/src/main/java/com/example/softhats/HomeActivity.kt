@@ -21,32 +21,33 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // --- LÓGICA DE SINCRONIZACIÓN (OPCIONAL SI YA LA TIENES) ---
+        // Si ya tienes la lógica de sincronización en otro lado o no la necesitas aquí, puedes quitar este bloque
         val gorraService = GorraService(this)
         gorraService.obtenerYGuardarGorras(
             onSuccess = { lista: List<GorraEntity> ->
-                Toast.makeText(
-                    this,
-                    " Se obtuvieron ${lista.size} gorras del servidor.",
-                    Toast.LENGTH_LONG
-                ).show()
+                // Feedback visual opcional
+                // Toast.makeText(this, "Sincronizado: ${lista.size} gorras", Toast.LENGTH_SHORT).show()
 
                 val db = AppDatabase.getDatabase(this)
                 lifecycleScope.launch {
+                    // Lógica espejo: Borrar todo e insertar lo nuevo
                     db.gorraDao().borrarTodo()
                     db.gorraDao().insertarTodas(lista)
                 }
             },
             onError = { error: String ->
-                Toast.makeText(this, " Error al obtener datos: $error", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error de red: $error", Toast.LENGTH_LONG).show()
             }
         )
+        // ------------------------------------------------------------
 
-        // ✅ 3. Cargar el HomeFragment por defecto (solo la primera vez)
+        // 1. Cargar el HomeFragment por defecto
         if (savedInstanceState == null) {
             cambiarFragmento(HomeFragment())
         }
 
-        // ✅ 4. Configurar la barra inferior (Bottom Navigation)
+        // 2. Configurar la barra inferior
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> cambiarFragmento(HomeFragment())
@@ -57,20 +58,20 @@ class HomeActivity : AppCompatActivity() {
             true
         }
 
-        // ✅ 5. Botón del carrito (abre la actividad Carrito)
+        // 3. Botón del Carrito (Derecha)
         binding.btnCarritoTop.setOnClickListener {
             val intent = Intent(this, CarritoActivity::class.java)
             startActivity(intent)
         }
 
-        // ✅ 6. Botón del mapa (abre la actividad Maps)
+        // 4. Botón del Mapa (Izquierda) - NUEVO
         binding.btnMapa.setOnClickListener {
+            // Asegúrate de que MapsActivity exista (la bajaste con git pull)
             val intent = Intent(this, MapsActivity::class.java)
             startActivity(intent)
         }
     }
 
-    // 🔄 Función auxiliar para cambiar fragmentos dinámicamente
     private fun cambiarFragmento(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
