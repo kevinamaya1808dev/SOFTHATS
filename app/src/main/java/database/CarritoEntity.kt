@@ -5,9 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "carrito")
 data class CarritoEntity(
-    @PrimaryKey val idProducto: Int, // Usamos el ID del producto como clave para que no se repita el mismo producto dos veces
+    @PrimaryKey val idProducto: Int,
     val nombre: String,
     val precioUnitario: Double,
     val cantidad: Int,
-    val total: Double // Esto será precioUnitario * cantidad
+    val total: Double,
+    val imagen: String // <--- ¡AQUÍ ESTÁ LA CLAVE PARA LAS FOTOS!
 )

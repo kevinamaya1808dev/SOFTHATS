@@ -11,13 +11,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.softhats.databinding.FragmentHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var db: FirebaseFirestore
-    private lateinit var gorraArrayList: ArrayList<Gorra>
-    private lateinit var gorraAdapter: GorraAdapter
+
+    // Listas y Adaptadores
+    private lateinit var novedadesList: ArrayList<Gorra>
+    private lateinit var novedadesAdapter: GorraAdapter
+    private lateinit var tendenciasList: ArrayList<Gorra>
+    private lateinit var tendenciasAdapter: GorraAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,57 +35,91 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 1. Configurar el botón del Banner (Ver Ahora -> Ir a Catálogo)
-        binding.btnVerAhora.setOnClickListener {
-            // Buscamos la barra de navegación de la actividad principal y cambiamos la selección
-            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation)
-            bottomNav.selectedItemId = R.id.nav_catalogo
-        }
-
-        // 2. Configurar el RecyclerView de TENDENCIAS (Horizontal)
-        // Usamos LinearLayoutManager HORIZONTAL para que se deslice de lado
-        binding.rvTendencias.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        gorraArrayList = ArrayList()
-        gorraAdapter = GorraAdapter(requireContext(), gorraArrayList)
-
-        // Al hacer clic en una gorra de tendencias, vamos al detalle igual que en el catálogo
-        gorraAdapter.onItemClick = { gorra ->
-            val intent = Intent(requireContext(), DetalleGorraActivity::class.java)
-            intent.putExtra("EXTRA_NOMBRE", gorra.nombre)
-            intent.putExtra("EXTRA_PRECIO", gorra.precio)
-            intent.putExtra("EXTRA_DESCRIPCION", gorra.descripcion)
-            intent.putExtra("EXTRA_IMAGEN", gorra.imagen_nombre)
-            startActivity(intent)
-        }
-
-        binding.rvTendencias.adapter = gorraAdapter
-
-        // 3. Cargar datos de Firebase (Limitado a 5 para simular "Destacados")
         db = FirebaseFirestore.getInstance()
-        cargarTendencias()
+
+        // 1. Botón del Banner
+        binding.btnVerAhora.setOnClickListener {
+            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation).selectedItemId = R.id.nav_catalogo
+        }
+
+        // 2. Botones de Scroll (Novedades y Tendencias)
+        // NOTA: Como cambiamos a Cards en el XML, este código funcionará automáticamente al recompilar
+        binding.btnFilterNovedades.setOnClickListener {
+            binding.root.smoothScrollTo(0, binding.tvTitleNovedades.top)
+        }
+
+        binding.btnFilterTendencias.setOnClickListener {
+            binding.root.smoothScrollTo(0, binding.tvTitleTendencias.top)
+        }
+
+        // 3. Configurar Listas
+        setupRecyclerViews()
+
+        // 4. Cargar datos
+        cargarDatos()
+    }
+
+    private fun setupRecyclerViews() {
+        // Lista Novedades
+        binding.rvNovedades.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        novedadesList = ArrayList()
+        novedadesAdapter = GorraAdapter(requireContext(), novedadesList)
+        novedadesAdapter.onItemClick = { gorra -> abrirDetalle(gorra) }
+        binding.rvNovedades.adapter = novedadesAdapter
+
+        // Lista Tendencias
+        binding.rvTendencias.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        tendenciasList = ArrayList()
+        tendenciasAdapter = GorraAdapter(requireContext(), tendenciasList)
+        tendenciasAdapter.onItemClick = { gorra -> abrirDetalle(gorra) }
+        binding.rvTendencias.adapter = tendenciasAdapter
+    }
+
+    private fun cargarDatos() {
+        binding.progressCarga.visibility = View.VISIBLE
+
+        // Consulta 1: Novedades (Orden por precio descendente)
+        db.collection("gorras")
+            .orderBy("precio", Query.Direction.DESCENDING)
+            .limit(6)
+            .get()
+            .addOnSuccessListener { result ->
+                novedadesList.clear()
+                for (document in result) {
+                    novedadesList.add(document.toObject(Gorra::class.java))
+                }
+                novedadesAdapter.notifyDataSetChanged()
+                cargarTendencias() // Encadenar la siguiente carga
+            }
+            .addOnFailureListener {
+                binding.progressCarga.visibility = View.GONE
+                Log.e("HomeFragment", "Error novedades")
+            }
     }
 
     private fun cargarTendencias() {
-        // Mostrar carga
-        binding.progressTendencias.visibility = View.VISIBLE
-
-        // Traemos solo 5 gorras para no saturar el inicio
+        // Consulta 2: Tendencias (Orden por precio ascendente)
         db.collection("gorras")
-            .limit(5)
+            .orderBy("precio", Query.Direction.ASCENDING)
+            .limit(6)
             .get()
             .addOnSuccessListener { result ->
-                binding.progressTendencias.visibility = View.GONE
-                gorraArrayList.clear()
+                binding.progressCarga.visibility = View.GONE
+                tendenciasList.clear()
                 for (document in result) {
-                    val gorra = document.toObject(Gorra::class.java)
-                    gorraArrayList.add(gorra)
+                    tendenciasList.add(document.toObject(Gorra::class.java))
                 }
-                gorraAdapter.notifyDataSetChanged()
+                tendenciasAdapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
-                binding.progressTendencias.visibility = View.GONE
-                Log.e("HomeFragment", "Error cargando tendencias", exception)
-            }
+            .addOnFailureListener { binding.progressCarga.visibility = View.GONE }
+    }
+
+    private fun abrirDetalle(gorra: Gorra) {
+        val intent = Intent(requireContext(), DetalleGorraActivity::class.java)
+        intent.putExtra("EXTRA_NOMBRE", gorra.nombre)
+        intent.putExtra("EXTRA_PRECIO", gorra.precio)
+        intent.putExtra("EXTRA_DESCRIPCION", gorra.descripcion)
+        intent.putExtra("EXTRA_IMAGEN", gorra.imagen_nombre)
+        startActivity(intent)
     }
 }

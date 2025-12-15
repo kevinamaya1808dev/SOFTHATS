@@ -13,31 +13,40 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- Nombre del Producto -->
+        <ImageView
+            android:id="@+id/ivImagenCarrito"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/gorra_negraangeles"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_circle_white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <TextView
             android:id="@+id/tvNombreCarrito"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:text="Gorra Dandy Summer"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivImagenCarrito"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnEliminar" />
 
-        <!-- Precio Unitario -->
         <TextView
             android:id="@+id/tvPrecioCarrito"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="$ 1,599.00"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textColor="#4CAF50"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/tvNombreCarrito"
             app:layout_constraintTop_toBottomOf="@+id/tvNombreCarrito" />
 
-        <!-- Botón Eliminar (Basura) -->
         <ImageButton
             android:id="@+id/btnEliminar"
             android:layout_width="40dp"
@@ -48,22 +57,25 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Controles de Cantidad (+ 1 -) -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvNombreCarrito">
 
             <Button
                 android:id="@+id/btnRestar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:text="-"
                 android:padding="0dp"
+                android:textSize="16sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
             <TextView
@@ -71,16 +83,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginHorizontal="12dp"/>
+                android:layout_marginHorizontal="10dp"/>
 
             <Button
                 android:id="@+id/btnSumar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:text="+"
                 android:padding="0dp"
+                android:textSize="16sp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
         </LinearLayout>
 

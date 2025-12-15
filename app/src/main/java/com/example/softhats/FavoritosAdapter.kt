@@ -57,7 +57,7 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
             }
 
             // ---------------------------------------------------------------
-            // 3. NUEVO CÓDIGO: Clic en el botón del carrito (btnCarrito)
+            // 3. Clic en el botón del carrito (btnCarrito)
             // ---------------------------------------------------------------
             binding.btnCarrito.setOnClickListener {
                 val context = binding.root.context
@@ -70,10 +70,12 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
                     nombre = favorito.nombre,
                     precioUnitario = favorito.precio,
                     cantidad = cantidadInicial,
-                    total = favorito.precio * cantidadInicial
+                    total = favorito.precio * cantidadInicial,
+                    // 🟢 AQUÍ ESTABA EL ERROR: Faltaba pasar la imagen
+                    imagen = favorito.imagenNombre
                 )
 
-                // Usamos Corrutinas para guardar en BD (Igual que en GorraAdapter)
+                // Usamos Corrutinas para guardar en BD
                 val scope = (context as? LifecycleOwner)?.lifecycleScope
                     ?: kotlinx.coroutines.GlobalScope
 

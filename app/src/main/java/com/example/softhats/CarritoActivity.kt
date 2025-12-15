@@ -27,7 +27,6 @@ class CarritoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityCarritoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -36,7 +35,6 @@ class CarritoActivity : AppCompatActivity() {
         setupRecyclerView()
         observarCarrito()
 
-        // Botón ÚNICO: Guarda Ticket y Envia a WhatsApp
         binding.btnPagar.setOnClickListener {
             procesarPedidoCompleto()
         }
@@ -92,13 +90,10 @@ class CarritoActivity : AppCompatActivity() {
         }
     }
 
-    // ------------------------------------------------------------
-    // 🟢 FUNCIÓN PRINCIPAL: TICKET + WHATSAPP (FORMATO ORIGINAL)
-    // ------------------------------------------------------------
     private fun procesarPedidoCompleto() {
         lifecycleScope.launch(Dispatchers.IO) {
 
-            // 1. Obtener productos
+            // 1. Obtener productos (Una sola vez para generar el ticket)
             val carrito = database.carritoDao().obtenerCarrito().first()
 
             if (carrito.isEmpty()) {
@@ -108,16 +103,12 @@ class CarritoActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // 2. Preparar Fechas
+            // 2. Preparar datos
             val fechaVisual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
-
-            // Nombre seguro para archivo (sin / ni :)
             val formatoNombre = SimpleDateFormat("dd-MMM-yyyy_HH-mm-ss", Locale.getDefault())
             val nombreArchivo = "Ticket_${formatoNombre.format(Date())}.txt"
 
-            // ---------------------------------------------------------
-            // PASO A: GENERAR ARCHIVO DE TEXTO (REQUERIMIENTO ESCOLAR)
-            // ---------------------------------------------------------
+            // 3. Generar Archivo Ticket
             val sbTicket = StringBuilder()
             sbTicket.appendLine("----- TICKET HATSGO -----")
             sbTicket.appendLine("Fecha: $fechaVisual")
@@ -139,41 +130,37 @@ class CarritoActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
 
-            // ---------------------------------------------------------
-            // PASO B: MENSAJE DE WHATSAPP (TU ESTRUCTURA ORIGINAL)
-            // ---------------------------------------------------------
+            // 4. Generar Mensaje WhatsApp
             val sbWhatsApp = StringBuilder()
-            var totalFinal = 0.0
-
             sbWhatsApp.append("*NUEVO PEDIDO HATSGO* 🧢\n")
             sbWhatsApp.append("📅 Fecha: $fechaVisual\n")
             sbWhatsApp.append("----------------------------\n")
-
             for (item in carrito) {
-                // Formato original: ▪️ 2x *Gorra Nike*
                 sbWhatsApp.append("▪️ ${item.cantidad}x *${item.nombre}*\n")
                 sbWhatsApp.append("   Subtotal: $${item.total}\n")
-                totalFinal += item.total
             }
-
             sbWhatsApp.append("----------------------------\n")
-            sbWhatsApp.append("💰 *TOTAL A PAGAR: $${totalFinal}*\n")
+            sbWhatsApp.append("💰 *TOTAL A PAGAR: $${totalTicket}*\n")
             sbWhatsApp.append("----------------------------\n")
             sbWhatsApp.append("EN BREVE UN VENDEDOR SE CONTACTARA CONTIGO .")
 
-            // 3. Ejecutar acciones en pantalla
-            withContext(Dispatchers.Main) {
-                // Aviso discreto de que se guardó el ticket
-                Toast.makeText(this@CarritoActivity, "Ticket guardado: $nombreArchivo", Toast.LENGTH_LONG).show()
+            // 5. ¡AQUÍ ESTÁ EL CAMBIO! -> VACIAR CARRITO
+            // Borramos todo de la base de datos ANTES de ir a WhatsApp
+            database.carritoDao().vaciarCarrito() // <--- Asegúrate que esta función exista en tu DAO
 
-                // Abrir WhatsApp con el mensaje original
+            // 6. Volver al hilo principal para abrir WhatsApp
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@CarritoActivity, "Pedido procesado. Ticket guardado.", Toast.LENGTH_SHORT).show()
                 abrirWhatsApp(sbWhatsApp.toString())
+
+                // Opcional: Cerrar actividad para volver al Home vacio
+                finish()
             }
         }
     }
 
     private fun abrirWhatsApp(mensaje: String) {
-        val numeroVendedor = "525645119567"
+        val numeroVendedor = "525645119567" // Tu número
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse("https://api.whatsapp.com/send?phone=$numeroVendedor&text=${Uri.encode(mensaje)}")
