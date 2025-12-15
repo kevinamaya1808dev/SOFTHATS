@@ -32,29 +32,37 @@ class CarritoAdapter(
             onRestar: (CarritoEntity) -> Unit,
             onEliminar: (CarritoEntity) -> Unit
         ) {
+            // 1. Asignar datos de texto
             binding.tvNombreCarrito.text = item.nombre
             binding.tvPrecioCarrito.text = "$ ${String.format(Locale.getDefault(), "%,.2f", item.precioUnitario)}"
             binding.tvCantidad.text = item.cantidad.toString()
 
-            // --- LÓGICA NUEVA PARA LA IMAGEN ---
+            // 2. Lógica de Imagen (MEJORADA Y SEGURA)
             val context = binding.root.context
-            // Asumimos que en tu Entity tienes un campo llamado 'imagen' (ej. "gorra_murakami")
-            val nombreImagen = item.imagen // <--- ASEGÚRATE QUE TU ENTITY TENGA ESTE CAMPO
 
-            val resourceId = context.resources.getIdentifier(
-                nombreImagen,
-                "drawable",
-                context.packageName
-            )
+            // Verificamos que el nombre de la imagen no sea nulo
+            val nombreImagen = item.imagen
 
-            // Si encuentra la imagen, la pone. Si no, pone una por defecto (el launcher)
-            if (resourceId != 0) {
-                binding.ivImagenCarrito.setImageResource(resourceId)
+            if (!nombreImagen.isNullOrEmpty()) {
+                val resourceId = context.resources.getIdentifier(
+                    nombreImagen,
+                    "drawable",
+                    context.packageName
+                )
+
+                // Si encontramos la imagen en la carpeta drawable, la ponemos
+                if (resourceId != 0) {
+                    binding.ivImagenCarrito.setImageResource(resourceId)
+                } else {
+                    // Si el nombre existe pero el archivo no, ponemos icono por defecto
+                    binding.ivImagenCarrito.setImageResource(android.R.drawable.ic_menu_gallery)
+                }
             } else {
-                binding.ivImagenCarrito.setImageResource(R.mipmap.ic_launcher)
+                // Si el campo imagen viene vacío, ponemos icono por defecto
+                binding.ivImagenCarrito.setImageResource(android.R.drawable.ic_menu_gallery)
             }
-            // -----------------------------------
 
+            // 3. Asignar acciones a los botones
             binding.btnSumar.setOnClickListener { onSumar(item) }
             binding.btnRestar.setOnClickListener { onRestar(item) }
             binding.btnEliminar.setOnClickListener { onEliminar(item) }

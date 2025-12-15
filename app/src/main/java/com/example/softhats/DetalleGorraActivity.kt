@@ -1,5 +1,6 @@
 package com.example.softhats
 
+import android.graphics.Color // IMPORTANTE: Agregado para manejar los colores
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -88,11 +89,16 @@ class DetalleGorraActivity : AppCompatActivity() {
         }
     }
 
+    // 🟡 FUNCIÓN MODIFICADA: Controla el color EXACTO de la estrella
     private fun actualizarIconoFavorito() {
         if (esFavorito) {
+            // Caso SI es favorito: Icono lleno + Color AMARILLO DORADO
             binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_on)
+            binding.fabFavorito.setColorFilter(Color.parseColor("#FFC107"))
         } else {
+            // Caso NO es favorito: Icono vacío + Color GRIS
             binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_off)
+            binding.fabFavorito.setColorFilter(Color.parseColor("#9E9E9E"))
         }
     }
 
@@ -102,7 +108,6 @@ class DetalleGorraActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             // 1. Preguntar: ¿Ya existe esta gorra en el carrito?
-            // NOTA: Asegúrate de haber agregado 'obtenerProducto(id)' en tu CarritoDao
             val productoExistente = db.carritoDao().obtenerProducto(id)
 
             val cantidadFinal = if (productoExistente != null) {

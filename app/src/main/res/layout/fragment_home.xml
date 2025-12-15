@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="#757575"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,25 +40,22 @@
                         android:layout_height="match_parent"
                         android:src="@drawable/gorra_negraangeles"
                         android:scaleType="centerCrop" />
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/gorra_negrabrillos"
                         android:scaleType="centerCrop" />
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/gorra_angel_azul"
                         android:scaleType="centerCrop" />
-
                 </ViewFlipper>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#50000000"/>
+                    android:background="#70000000"/>
 
                 <TextView
                     android:id="@+id/tvBannerTitle"
@@ -68,9 +65,13 @@
                     android:layout_marginTop="40dp"
                     android:layout_marginEnd="60dp"
                     android:text="Nueva Colección\nUrbana 2025"
-                    android:textColor="@color/white"
+                    android:textColor="#FFFFFF"
                     android:textSize="28sp"
                     android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="10"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -80,8 +81,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Estilo que define tu ciudad."
-                    android:textColor="#E0E0E0"
+                    android:textColor="#FFFFFF"
                     android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:shadowColor="#000000"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="5"
                     app:layout_constraintStart_toStartOf="@+id/tvBannerTitle"
                     app:layout_constraintTop_toBottomOf="@+id/tvBannerTitle" />
 
@@ -110,7 +116,6 @@
             android:orientation="horizontal"
             android:weightSum="2"
             app:layout_constraintTop_toBottomOf="@+id/cardBanner">
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnFilterNovedades"
                 android:layout_width="0dp"
@@ -121,22 +126,18 @@
                 app:cardElevation="4dp"
                 android:clickable="true"
                 android:focusable="true">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/gorra_murakami"
                         android:scaleType="centerCrop" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="#70000000"/>
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -162,22 +163,18 @@
                 app:cardElevation="4dp"
                 android:clickable="true"
                 android:focusable="true">
-
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/gorra_chrome"
                         android:scaleType="centerCrop" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="#80FF5722"/>
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -192,7 +189,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
 
         <TextView
@@ -202,9 +198,13 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
             android:text="Recién Llegados"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
             android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layoutBotones" />
 
@@ -226,9 +226,13 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
             android:text="Lo Más Vendido 🔥"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
             android:textStyle="bold"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rvNovedades" />
 
