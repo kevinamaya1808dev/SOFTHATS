@@ -5,4 +5,6 @@
     <color name="black">#000000</color>
 
     <color name="softHats_light_blue">#E0F2FE</color>
+
+    <color name="fondo_general">#9C9C9C</color>
 </resources>
