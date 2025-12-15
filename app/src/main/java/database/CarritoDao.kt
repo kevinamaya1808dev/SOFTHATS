@@ -19,6 +19,10 @@ interface CarritoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarOActualizar(item: CarritoEntity)
 
+    // 🟢 AGREGA ESTA NUEVA FUNCIÓN:
+    @Query("SELECT * FROM carrito WHERE idProducto = :id LIMIT 1")
+    suspend fun obtenerProducto(id: Int): CarritoEntity?
+
     // Eliminar un producto específico
     @Query("DELETE FROM carrito WHERE idProducto = :idProducto")
     suspend fun eliminarProducto(idProducto: Int)

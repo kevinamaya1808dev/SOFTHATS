@@ -9,14 +9,12 @@ import com.example.softhats.database.CarritoEntity
 import com.example.softhats.databinding.ItemCarritoBinding
 import java.util.Locale
 
-// Este adaptador recibe funciones (lambdas) para saber qué hacer cuando le pican a los botones
 class CarritoAdapter(
     private val onSumarClick: (CarritoEntity) -> Unit,
     private val onRestarClick: (CarritoEntity) -> Unit,
     private val onEliminarClick: (CarritoEntity) -> Unit
 ) : ListAdapter<CarritoEntity, CarritoAdapter.CarritoViewHolder>(DiffCallback) {
 
-    // Clase para comparar items y saber si actualizaron la lista
     companion object DiffCallback : DiffUtil.ItemCallback<CarritoEntity>() {
         override fun areItemsTheSame(oldItem: CarritoEntity, newItem: CarritoEntity): Boolean {
             return oldItem.idProducto == newItem.idProducto
@@ -27,7 +25,6 @@ class CarritoAdapter(
         }
     }
 
-    // ViewHolder: Mantiene las referencias a los controles de cada renglón
     class CarritoViewHolder(private val binding: ItemCarritoBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: CarritoEntity,
@@ -39,7 +36,25 @@ class CarritoAdapter(
             binding.tvPrecioCarrito.text = "$ ${String.format(Locale.getDefault(), "%,.2f", item.precioUnitario)}"
             binding.tvCantidad.text = item.cantidad.toString()
 
-            // Configurar botones
+            // --- LÓGICA NUEVA PARA LA IMAGEN ---
+            val context = binding.root.context
+            // Asumimos que en tu Entity tienes un campo llamado 'imagen' (ej. "gorra_murakami")
+            val nombreImagen = item.imagen // <--- ASEGÚRATE QUE TU ENTITY TENGA ESTE CAMPO
+
+            val resourceId = context.resources.getIdentifier(
+                nombreImagen,
+                "drawable",
+                context.packageName
+            )
+
+            // Si encuentra la imagen, la pone. Si no, pone una por defecto (el launcher)
+            if (resourceId != 0) {
+                binding.ivImagenCarrito.setImageResource(resourceId)
+            } else {
+                binding.ivImagenCarrito.setImageResource(R.mipmap.ic_launcher)
+            }
+            // -----------------------------------
+
             binding.btnSumar.setOnClickListener { onSumar(item) }
             binding.btnRestar.setOnClickListener { onRestar(item) }
             binding.btnEliminar.setOnClickListener { onEliminar(item) }
