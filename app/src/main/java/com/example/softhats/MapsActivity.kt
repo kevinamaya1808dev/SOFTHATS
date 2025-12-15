@@ -1,61 +1,90 @@
 package com.example.softhats
 
-import androidx.appcompat.app.AppCompatActivity
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
-
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.example.softhats.databinding.ActivityMapsBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.example.softhats.databinding.ActivityMapsBinding
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var fusedClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        fusedClient = LocationServices.getFusedLocationProviderClient(this)
+
+        binding.btnSoftHats.setOnClickListener {
+            val softHats = LatLng(19.2632604, -98.9035804) // Coordenadas de SoftHats
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(softHats, 17f))
+            Toast.makeText(this, "Mostrando ubicación de SoftHats", Toast.LENGTH_SHORT).show()
+        }
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        binding.btnUbicacionActual.setOnClickListener {
+            mostrarUbicacionActual()
+        }
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        val tescha = LatLng(19.2324377, -98.8442159)
-
+        val chalco = LatLng(19.2632604, -98.9035804)
         val marker = MarkerOptions()
-            .position(tescha)
+            .position(chalco)
             .title("Sucursal Principal HatsGo")
-            .snippet("TESCHA - Carretera México-Cuautla Km 38+100, Chalco, Edo. de México")
+            .snippet("Chalco de Díaz Covarrubias, Méx.")
 
         mMap.addMarker(marker)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(chalco, 17f))
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+    }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tescha, 17f))
-
-        mMap.setOnMarkerClickListener { marker ->
-            marker.showInfoWindow()
-            true
+    private fun mostrarUbicacionActual() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+            return
         }
 
-        mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE
+        fusedClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                val miUbicacion = LatLng(location.latitude, location.longitude)
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(miUbicacion)
+                        .title("Tu ubicación actual")
+                )
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(miUbicacion, 17f))
+                Toast.makeText(this, "Ubicación actual encontrada", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "No se pudo obtener la ubicación actual", Toast.LENGTH_SHORT).show()
+            }
         }
     }
+}
