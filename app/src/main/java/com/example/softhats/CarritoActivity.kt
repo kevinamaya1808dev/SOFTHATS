@@ -1,5 +1,8 @@
 package com.example.softhats
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -9,8 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.CarritoEntity
 import com.example.softhats.databinding.ActivityCarritoBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Locale
+import kotlinx.coroutines.withContext
+import java.io.OutputStreamWriter
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CarritoActivity : AppCompatActivity() {
 
@@ -32,14 +40,9 @@ class CarritoActivity : AppCompatActivity() {
         // 3. Observar los datos del carrito en tiempo real
         observarCarrito()
 
-<<<<<<< HEAD
-=======
-        // 4. Botón Pagar (Simulado)
->>>>>>> 497abeaf50ca4bc9e9a857e51eebf62e007f7eca
+        // 4. Botón Pagar: Llama a la función completa (Ticket + WhatsApp + Vaciar)
         binding.btnPagar.setOnClickListener {
-            Toast.makeText(this, "Procesando compra... ¡Gracias!", Toast.LENGTH_LONG).show()
-            // Aquí podrías borrar el carrito después de pagar
-            lifecycleScope.launch { database.carritoDao().vaciarCarrito() }
+            procesarPedidoCompleto()
         }
     }
 
@@ -91,25 +94,27 @@ class CarritoActivity : AppCompatActivity() {
                 cantidad = nuevaCantidad,
                 total = item.precioUnitario * nuevaCantidad
             )
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 database.carritoDao().insertarOActualizar(itemActualizado)
             }
         } else {
-            // Si la cantidad llega a 0, preguntamos o eliminamos directo (aquí eliminamos directo)
+            // Si la cantidad llega a 0, eliminamos
             eliminarItem(item)
         }
     }
 
     private fun eliminarItem(item: CarritoEntity) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             database.carritoDao().eliminarProducto(item.idProducto)
-<<<<<<< HEAD
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@CarritoActivity, "${item.nombre} eliminado", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    // ------------------------------------------------------------
+    // 🟢 FUNCIÓN PRINCIPAL: TICKET + WHATSAPP + VACIAR CARRITO
+    // ------------------------------------------------------------
     private fun procesarPedidoCompleto() {
         lifecycleScope.launch(Dispatchers.IO) {
 
@@ -123,7 +128,7 @@ class CarritoActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // 2. Preparar datos
+            // 2. Preparar Fechas
             val fechaVisual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
             val formatoNombre = SimpleDateFormat("dd-MMM-yyyy_HH-mm-ss", Locale.getDefault())
             val nombreArchivo = "Ticket_${formatoNombre.format(Date())}.txt"
@@ -164,13 +169,13 @@ class CarritoActivity : AppCompatActivity() {
             sbWhatsApp.append("----------------------------\n")
             sbWhatsApp.append("EN BREVE UN VENDEDOR SE CONTACTARA CONTIGO .")
 
-            // 5. ¡AQUÍ ESTÁ EL CAMBIO! -> VACIAR CARRITO
-            // Borramos todo de la base de datos ANTES de ir a WhatsApp
-            database.carritoDao().vaciarCarrito() // <--- Asegúrate que esta función exista en tu DAO
+            // 5. VACIAR CARRITO
+            // Esto borra la BD después de procesar el pedido
+            database.carritoDao().vaciarCarrito()
 
             // 6. Volver al hilo principal para abrir WhatsApp
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@CarritoActivity, "Pedido procesado. Ticket guardado.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@CarritoActivity, "Pedido procesado. Ticket guardado.", Toast.LENGTH_LONG).show()
                 abrirWhatsApp(sbWhatsApp.toString())
 
                 // Opcional: Cerrar actividad para volver al Home vacio
@@ -187,9 +192,6 @@ class CarritoActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
-=======
-            Toast.makeText(this@CarritoActivity, "${item.nombre} eliminado", Toast.LENGTH_SHORT).show()
->>>>>>> 497abeaf50ca4bc9e9a857e51eebf62e007f7eca
         }
     }
 }

@@ -1,17 +1,26 @@
 package com.example.softhats
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.softhats.database.AppDatabase
+import com.example.softhats.database.CarritoEntity
 import com.example.softhats.database.FavoritoEntity
 import com.example.softhats.databinding.ItemGorraBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoViewHolder>(DiffCallback) {
 
-    // 1. Variable para guardar la acción de clic (El "Cable")
+    // Variable para guardar la acción de clic (Ir a detalles)
     var onItemClick: ((FavoritoEntity) -> Unit)? = null
 
     companion object DiffCallback : DiffUtil.ItemCallback<FavoritoEntity>() {
@@ -25,9 +34,11 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
     }
 
     class FavoritoViewHolder(private val binding: ItemGorraBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(favorito: FavoritoEntity, clickListener: ((FavoritoEntity) -> Unit)?) {
-            // Datos visuales
+            // 1. Datos visuales
             binding.tvNombreGorra.text = favorito.nombre
+            // Asumiendo que favorito.precio ya es Double, lo formateamos bonito
             binding.tvPrecioGorra.text = "$ ${String.format(Locale.getDefault(), "%,.2f", favorito.precio)}"
 
             if (favorito.imagenNombre.isNotEmpty()) {
@@ -35,14 +46,15 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
                 val resourceId = context.resources.getIdentifier(favorito.imagenNombre, "drawable", context.packageName)
                 if (resourceId != 0) {
                     binding.ivGorra.setImageResource(resourceId)
+                } else {
+                    binding.ivGorra.setImageResource(R.drawable.ic_launcher_foreground)
                 }
             }
 
-            // 2. Configurar el clic: Cuando toquen la tarjeta, avisamos
+            // 2. Clic en la tarjeta completa (Para ver detalles)
             itemView.setOnClickListener {
                 clickListener?.invoke(favorito)
             }
-<<<<<<< HEAD
 
             // ---------------------------------------------------------------
             // 3. Clic en el botón del carrito (btnCarrito)
@@ -91,8 +103,6 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
                     }
                 }
             }
-=======
->>>>>>> 497abeaf50ca4bc9e9a857e51eebf62e007f7eca
         }
     }
 
@@ -103,7 +113,6 @@ class FavoritosAdapter : ListAdapter<FavoritoEntity, FavoritosAdapter.FavoritoVi
 
     override fun onBindViewHolder(holder: FavoritoViewHolder, position: Int) {
         val favorito = getItem(position)
-        // 3. Pasamos el listener al ViewHolder
         holder.bind(favorito, onItemClick)
     }
 }

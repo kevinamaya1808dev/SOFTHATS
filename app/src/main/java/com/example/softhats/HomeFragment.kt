@@ -39,11 +39,12 @@ class HomeFragment : Fragment() {
 
         // 1. Botón del Banner
         binding.btnVerAhora.setOnClickListener {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation).selectedItemId = R.id.nav_catalogo
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNavigation)
+            bottomNav?.selectedItemId = R.id.nav_catalogo
         }
 
         // 2. Botones de Scroll (Novedades y Tendencias)
-        // NOTA: Como cambiamos a Cards en el XML, este código funcionará automáticamente al recompilar
+        // Al pegar esto, Android Studio sabrá que son Tarjetas (CardView) y no LinearLayouts
         binding.btnFilterNovedades.setOnClickListener {
             binding.root.smoothScrollTo(0, binding.tvTitleNovedades.top)
         }
@@ -78,7 +79,7 @@ class HomeFragment : Fragment() {
     private fun cargarDatos() {
         binding.progressCarga.visibility = View.VISIBLE
 
-        // Consulta 1: Novedades (Orden por precio descendente)
+        // Consulta 1: Novedades
         db.collection("gorras")
             .orderBy("precio", Query.Direction.DESCENDING)
             .limit(6)
@@ -89,7 +90,7 @@ class HomeFragment : Fragment() {
                     novedadesList.add(document.toObject(Gorra::class.java))
                 }
                 novedadesAdapter.notifyDataSetChanged()
-                cargarTendencias() // Encadenar la siguiente carga
+                cargarTendencias()
             }
             .addOnFailureListener {
                 binding.progressCarga.visibility = View.GONE
@@ -98,7 +99,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun cargarTendencias() {
-        // Consulta 2: Tendencias (Orden por precio ascendente)
+        // Consulta 2: Tendencias
         db.collection("gorras")
             .orderBy("precio", Query.Direction.ASCENDING)
             .limit(6)
