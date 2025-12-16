@@ -110,7 +110,19 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:background="@drawable/bg_button_register"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="24dp" />
+
+        <!-- BOTÓN HISTORIAL -->
+        <TextView
+            android:id="@+id/btnHistorialTickets"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="Historial de compras"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_register"
+            android:layout_marginTop="12dp"
             android:layout_marginBottom="32dp" />
 
     </LinearLayout>

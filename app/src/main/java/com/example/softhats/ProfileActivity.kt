@@ -1,5 +1,8 @@
 package com.example.softhats
+import com.example.softhats.ui.HistorialTicketsActivity
 
+
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,8 +27,16 @@ class ProfileActivity : AppCompatActivity() {
 
         cargarDatosUsuario()
 
+        // GUARDAR PERFIL
         binding.btnGuardar.setOnClickListener {
             guardarCambios()
+        }
+
+        // 👉 ABRIR HISTORIAL DE TICKETS
+        binding.btnHistorialTickets.setOnClickListener {
+            startActivity(
+                Intent(this, HistorialTicketsActivity::class.java)
+            )
         }
     }
 

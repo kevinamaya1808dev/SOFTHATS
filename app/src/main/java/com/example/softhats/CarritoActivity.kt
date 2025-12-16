@@ -39,17 +39,17 @@ class CarritoActivity : AppCompatActivity() {
         observarCarrito()
 
         binding.btnPagar.setOnClickListener {
-            procesarPedidoCompleto()
+            confirmarEnvio()
         }
     }
 
+    // ================== RECYCLER ==================
     private fun setupRecyclerView() {
         adapter = CarritoAdapter(
-            onSumarClick = { item -> actualizarCantidad(item, 1) },
-            onRestarClick = { item -> actualizarCantidad(item, -1) },
-            onEliminarClick = { item -> eliminarItem(item) }
+            onSumarClick = { actualizarCantidad(it, 1) },
+            onRestarClick = { actualizarCantidad(it, -1) },
+            onEliminarClick = { eliminarItem(it) }
         )
-
         binding.rvCarrito.layoutManager = LinearLayoutManager(this)
         binding.rvCarrito.adapter = adapter
     }
@@ -69,24 +69,23 @@ class CarritoActivity : AppCompatActivity() {
     }
 
     private fun actualizarTotal(items: List<CarritoEntity>) {
-        val granTotal = items.sumOf { it.total }
+        val total = items.sumOf { it.total }
         binding.tvGranTotal.text =
-            "$ ${String.format(Locale.getDefault(), "%,.2f", granTotal)}"
+            "$ ${String.format(Locale.getDefault(), "%,.2f", total)}"
     }
 
     private fun actualizarCantidad(item: CarritoEntity, cambio: Int) {
         val nuevaCantidad = item.cantidad + cambio
         if (nuevaCantidad > 0) {
-            val actualizado = item.copy(
-                cantidad = nuevaCantidad,
-                total = item.precioUnitario * nuevaCantidad
-            )
             lifecycleScope.launch(Dispatchers.IO) {
-                database.carritoDao().insertarOActualizar(actualizado)
+                database.carritoDao().insertarOActualizar(
+                    item.copy(
+                        cantidad = nuevaCantidad,
+                        total = item.precioUnitario * nuevaCantidad
+                    )
+                )
             }
-        } else {
-            eliminarItem(item)
-        }
+        } else eliminarItem(item)
     }
 
     private fun eliminarItem(item: CarritoEntity) {
@@ -102,14 +101,21 @@ class CarritoActivity : AppCompatActivity() {
         }
     }
 
-    // --------------------------------------------------
-    // 🟢 PROCESAR PEDIDO → PDF → CONFIRMAR WHATSAPP
-    // --------------------------------------------------
+    // ================== CONFIRMAR ENVÍO ==================
+    private fun confirmarEnvio() {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmar pedido")
+            .setMessage("¿Deseas enviar el pedido por WhatsApp?")
+            .setPositiveButton("Sí") { _, _ -> procesarPedidoCompleto() }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // ================== PROCESAR PEDIDO ==================
     private fun procesarPedidoCompleto() {
         lifecycleScope.launch(Dispatchers.IO) {
 
             val carrito = database.carritoDao().obtenerCarrito().first()
-
             if (carrito.isEmpty()) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
@@ -121,74 +127,59 @@ class CarritoActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val fechaVisual = SimpleDateFormat(
-                "dd/MM/yyyy HH:mm",
-                Locale.getDefault()
-            ).format(Date())
+            val fecha = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+            val compraId = SimpleDateFormat("ddMMyyyy_HHmmss", Locale.getDefault()).format(Date())
+            val total = carrito.sumOf { it.total }
 
-            val compraId = SimpleDateFormat(
-                "ddMMyyyy_HHmmss",
-                Locale.getDefault()
-            ).format(Date())
+            val mensajeWhatsApp = buildString {
+                append("*NUEVO PEDIDO SOFTHATS* 🧢\n")
+                append("📅 Fecha: $fecha\n")
+                append("----------------------------\n")
+                carrito.forEach {
+                    append("▪ ${it.cantidad}x ${it.nombre}\n")
+                    append("  Subtotal: $${it.total}\n")
+                }
+                append("----------------------------\n")
+                append("💰 TOTAL: $${total}\n")
+            }
 
-            val itemsCompra = carrito.map { it.nombre to it.total }
-            val totalCompra = carrito.sumOf { it.total }
+            // 📲 WhatsApp PRIMERO
+            withContext(Dispatchers.Main) {
+                abrirWhatsApp(mensajeWhatsApp)
+            }
 
+            // 📄 Generar PDF
             val pdfFile = PdfUtils.generarTicketPdf(
                 this@CarritoActivity,
                 compraId,
-                itemsCompra,
-                totalCompra
+                carrito.map { it.nombre to it.total },
+                total
             )
-
-            val mensajeWhatsApp = StringBuilder().apply {
-                append("*NUEVO PEDIDO HATSGO* 🧢\n")
-                append("📅 Fecha: $fechaVisual\n")
-                append("----------------------------\n")
-                carrito.forEach {
-                    append("▪️ ${it.cantidad}x *${it.nombre}*\n")
-                    append("   Subtotal: $${it.total}\n")
-                }
-                append("----------------------------\n")
-                append("💰 *TOTAL A PAGAR: $${totalCompra}*\n")
-                append("----------------------------\n")
-                append("EN BREVE UN VENDEDOR SE CONTACTARÁ CONTIGO.")
-            }.toString()
 
             database.carritoDao().vaciarCarrito()
 
+            // 📄 Mostrar botón para abrir PDF
             withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    this@CarritoActivity,
-                    "Ticket PDF generado",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // 1️⃣ Abrir PDF
-                abrirPdf(pdfFile)
-
-                // 2️⃣ Confirmar WhatsApp
                 AlertDialog.Builder(this@CarritoActivity)
-                    .setTitle("Enviar pedido")
-                    .setMessage("¿Deseas enviar el pedido por WhatsApp?")
-                    .setPositiveButton("Sí") { _, _ ->
-                        abrirWhatsApp(mensajeWhatsApp)
+                    .setTitle("Ticket generado")
+                    .setMessage("¿Deseas ver tu ticket en PDF?")
+                    .setPositiveButton("Ver ticket") { _, _ ->
+                        abrirPdf(pdfFile)
+                    }
+                    .setNegativeButton("Cerrar") { _, _ ->
                         finish()
                     }
-                    .setNegativeButton("No", null)
                     .show()
             }
         }
     }
 
-    // --------------------------------------------------
-    // 📄 ABRIR PDF (CORRECTO)
-    // --------------------------------------------------
+    // ================== ABRIR PDF (FINAL Y SEGURO) ==================
     private fun abrirPdf(pdfFile: File) {
         try {
             val uri = FileProvider.getUriForFile(
                 this,
-                "${packageName}.fileprovider",
+                "$packageName.fileprovider",
                 pdfFile
             )
 
@@ -202,33 +193,19 @@ class CarritoActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                "No se pudo abrir el PDF",
-                Toast.LENGTH_SHORT
+                "No se pudo abrir el PDF. Instala un lector de PDF.",
+                Toast.LENGTH_LONG
             ).show()
             e.printStackTrace()
         }
     }
 
-    // --------------------------------------------------
-    // 📲 WHATSAPP
-    // --------------------------------------------------
+    // ================== WHATSAPP ==================
     private fun abrirWhatsApp(mensaje: String) {
-        val numeroVendedor = "525645119567"
-        try {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(
-                    "https://api.whatsapp.com/send?phone=$numeroVendedor&text=${
-                        Uri.encode(mensaje)
-                    }"
-                )
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                "No se pudo abrir WhatsApp",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        val numero = "525645119567"
+        val uri = Uri.parse(
+            "https://api.whatsapp.com/send?phone=$numero&text=${Uri.encode(mensaje)}"
+        )
+        startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 }

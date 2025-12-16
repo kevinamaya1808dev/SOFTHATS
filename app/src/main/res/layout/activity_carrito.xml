@@ -27,8 +27,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/containerTotal"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloCarrito"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloCarrito"
+        app:layout_constraintBottom_toTopOf="@id/containerTotal"
         tools:listitem="@layout/item_carrito" />
 
     <TextView
@@ -39,30 +39,29 @@
         android:textColor="#E0E0E0"
         android:textSize="18sp"
         android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerTotal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#333333"
-        android:elevation="16dp"
         android:padding="24dp"
+        android:elevation="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/tvLabelTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total a Pagar:"
+            android:text="Total a pagar:"
             android:textColor="#BDBDBD"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/tvGranTotal"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvGranTotal"
@@ -79,14 +78,24 @@
             android:id="@+id/btnPagar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:text="ENVIAR PEDIDO"
-            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
+            android:layout_marginTop="20dp"
             app:backgroundTint="#5C5C5C"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvGranTotal" />
+            app:layout_constraintTop_toBottomOf="@id/tvGranTotal" />
+
+        <Button
+            android:id="@+id/btnVerTicket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VER TICKET"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:visibility="gone"
+            android:layout_marginTop="12dp"
+            app:backgroundTint="#2E7D32"
+            app:layout_constraintTop_toBottomOf="@id/btnPagar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

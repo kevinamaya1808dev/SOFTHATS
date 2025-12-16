@@ -44,7 +44,6 @@ object PdfUtils {
             context.resources,
             R.drawable.ico
         )
-
         val logoScaled = Bitmap.createScaledBitmap(logoBitmap, 120, 120, true)
         canvas.drawBitmap(logoScaled, (pageWidth - 120) / 2f, y, null)
         y += 135f
@@ -120,7 +119,7 @@ object PdfUtils {
         paint.typeface = Typeface.DEFAULT
 
         // -------------------------
-        // 🔳 QR DEL PEDIDO
+        // 🔳 QR
         // -------------------------
         y += 30f
 
@@ -132,31 +131,22 @@ object PdfUtils {
         """.trimIndent()
 
         val qrBitmap = generarQr(qrContenido, 160)
-
-        canvas.drawBitmap(
-            qrBitmap,
-            (pageWidth - 160) / 2f,
-            y,
-            null
-        )
+        canvas.drawBitmap(qrBitmap, (pageWidth - 160) / 2f, y, null)
 
         y += 170f
         paint.textAlign = Paint.Align.CENTER
         canvas.drawText("Escanea para ver tu pedido", centerX, y, paint)
 
-        // -------------------------
-        // 🙏 MENSAJE FINAL
-        // -------------------------
         y += 20f
         canvas.drawText("¡Gracias por tu compra!", centerX, y, paint)
 
         pdfDocument.finishPage(page)
 
         // -------------------------
-        // 💾 GUARDAR PDF
+        // 💾 GUARDAR PDF (AQUÍ ESTÁ LA CLAVE)
         // -------------------------
         val pdfFile = File(
-            context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOWNLOADS),
+            context.filesDir,
             "Ticket_$compraId.pdf"
         )
 
@@ -169,7 +159,7 @@ object PdfUtils {
     }
 
     // -------------------------
-    // 🔳 GENERAR QR
+    // 🔳 QR
     // -------------------------
     private fun generarQr(texto: String, size: Int): Bitmap {
         val writer = QRCodeWriter()

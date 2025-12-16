@@ -2,14 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permisos -->
+    <!-- PERMISOS -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
-        android:allowBackup="true"
         android:usesCleartextTraffic="true"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ico"
@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SOFTHATS">
 
-        <!-- 🔴 FILE PROVIDER (OBLIGATORIO PARA PDF) -->
+        <!-- ================= FILE PROVIDER (OBLIGATORIO PARA PDF) ================= -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -29,7 +29,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Activities -->
+
+        <!-- ================= ACTIVITIES ================= -->
+
         <activity
             android:name=".ForgotPasswordActivity"
             android:exported="false" />
@@ -59,12 +61,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SetPasswordActivity" />
-
-        <!-- Google Maps -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCW5ht-A5a334X5BqZTxURnaPSUlh1Jyog" />
+        <activity
+            android:name=".SetPasswordActivity"
+            android:exported="false" />
 
         <activity
             android:name=".RegisterActivity"
@@ -81,6 +80,11 @@
         <activity
             android:name=".MapsActivity"
             android:exported="true" />
+
+        <!-- ================= GOOGLE MAPS ================= -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCW5ht-A5a334X5BqZTxURnaPSUlh1Jyog" />
 
     </application>
 
