@@ -20,14 +20,13 @@
         <!-- BOTÓN IZQUIERDO: MAPA -->
         <ImageView
             android:id="@+id/btnMapa"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_mapmode"
-            android:contentDescription="Abrir mapa TESCHA"
-            app:tint="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_marker"
+            android:contentDescription="Abrir mapa"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:clickable="true"
             android:focusable="true" />
 
@@ -51,7 +50,7 @@
             android:id="@+id/btnCarritoTop"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_shopping_cart"
+            android:src="@drawable/ic_nav_carrito"
             app:tint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
