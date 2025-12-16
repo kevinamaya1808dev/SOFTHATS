@@ -1,25 +1,18 @@
 package com.example.softhats
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.example.softhats.databinding.ActivityProfileBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.firestore.SetOptions
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
-    private val PICK_IMAGE = 200
-    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,90 +24,112 @@ class ProfileActivity : AppCompatActivity() {
 
         cargarDatosUsuario()
 
-        binding.btnChangePhoto.setOnClickListener { seleccionarFoto() }
-
-        binding.btnGuardar.setOnClickListener { guardarCambios() }
+        binding.btnGuardar.setOnClickListener {
+            guardarCambios()
+        }
     }
+
+    // ================== CARGAR DATOS ==================
 
     private fun cargarDatosUsuario() {
         val user = auth.currentUser ?: return
+
+        // Correo siempre desde Auth
+        binding.etEmail.setText(user.email ?: "")
 
         db.collection("usuarios").document(user.uid)
             .get()
             .addOnSuccessListener { doc ->
 
-                binding.etNombre.setText(doc.getString("nombre"))
-                binding.etApellidoP.setText(doc.getString("apellido_paterno"))
-                binding.etApellidoM.setText(doc.getString("apellido_materno"))
-                binding.etEmail.setText(user.email)
-                binding.etTelefono.setText(doc.getString("telefono"))
+                if (doc.exists()) {
 
-                val foto = doc.getString("foto")
-                if (!foto.isNullOrEmpty()) {
-                    Glide.with(this).load(foto).into(binding.ivUserProfile)
+                    val nombre = doc.getString("nombre")
+                    val apP = doc.getString("apellido_paterno")
+                    val apM = doc.getString("apellido_materno")
+                    val telefono = doc.getString("telefono")
+
+                    binding.etNombre.setText(nombre ?: "")
+                    binding.etApellidoP.setText(apP ?: "")
+                    binding.etApellidoM.setText(apM ?: "")
+                    binding.etTelefono.setText(telefono ?: "")
+
+                    // 🔔 Señalamiento si es Google y faltan datos
+                    if (esUsuarioGoogle() && (nombre.isNullOrEmpty() || telefono.isNullOrEmpty())) {
+                        Toast.makeText(
+                            this,
+                            "Completa tu registro para continuar",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                } else {
+                    // Documento NO existe (caso Google nuevo)
+                    if (esUsuarioGoogle()) {
+                        Toast.makeText(
+                            this,
+                            "Completa tu registro para continuar",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun seleccionarFoto() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE)
-    }
-
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        super.onActivityResult(req, res, data)
-
-        if (req == PICK_IMAGE && res == Activity.RESULT_OK) {
-            imageUri = data?.data
-            binding.ivUserProfile.setImageURI(imageUri)
-        }
-    }
+    // ================== GUARDAR ==================
 
     private fun guardarCambios() {
         val user = auth.currentUser ?: return
 
         val nombre = binding.etNombre.text.toString().trim()
-        val apP = binding.etApellidoP.text.toString().trim()
-        val apM = binding.etApellidoM.text.toString().trim()
-        val emailNuevo = binding.etEmail.text.toString().trim()
+        val apellidoP = binding.etApellidoP.text.toString().trim()
+        val apellidoM = binding.etApellidoM.text.toString().trim()
+        val email = binding.etEmail.text.toString().trim()
         val telefono = binding.etTelefono.text.toString().trim()
 
-        val datosActualizados = mapOf(
+        if (nombre.isEmpty() || apellidoP.isEmpty() || telefono.isEmpty()) {
+            Toast.makeText(
+                this,
+                "Completa los campos obligatorios",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val datos = hashMapOf(
+            "uid" to user.uid,
             "nombre" to nombre,
-            "apellido_paterno" to apP,
-            "apellido_materno" to apM,
-            "telefono" to telefono
+            "apellido_paterno" to apellidoP,
+            "apellido_materno" to apellidoM,
+            "telefono" to telefono,
+            "email" to email
         )
 
-        // Guardar datos en Firestore
         db.collection("usuarios").document(user.uid)
-            .update(datosActualizados)
+            .set(datos, SetOptions.merge())
             .addOnSuccessListener {
-
-                // Cambió correo → enviar email de verificación
-                if (emailNuevo != user.email) {
-                    user.updateEmail(emailNuevo).addOnSuccessListener {
-                        user.sendEmailVerification()
-                        Toast.makeText(this, "Correo actualizado. Revisa tu bandeja.", Toast.LENGTH_LONG).show()
-                    }
-                }
-
-                // Guardar foto
-                if (imageUri != null) subirFotoAStorage(user.uid)
-
-                Toast.makeText(this, "Datos guardados correctamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Perfil actualizado correctamente",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(
+                    this,
+                    "Error al guardar datos",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
-    private fun subirFotoAStorage(uid: String) {
-        val ref = FirebaseStorage.getInstance().reference.child("usuarios/$uid/perfil.jpg")
+    // ================== GOOGLE ==================
 
-        ref.putFile(imageUri!!)
-            .addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { url ->
-                    db.collection("usuarios").document(uid)
-                        .update("foto", url.toString())
-                }
-            }
+    private fun esUsuarioGoogle(): Boolean {
+        val user = auth.currentUser ?: return false
+        return user.providerData.any { it.providerId == "google.com" }
     }
 }

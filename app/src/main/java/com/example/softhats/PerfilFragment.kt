@@ -1,154 +1,214 @@
 package com.example.softhats
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.GridView
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
 import com.example.softhats.databinding.FragmentPerfilBinding
+import com.example.softhats.ui.profile.AvatarAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.*
 
-
-class PerfilFragment : Fragment() {
+class PerfilFragment : Fragment(R.layout.fragment_perfil) {
 
     private lateinit var binding: FragmentPerfilBinding
-    private lateinit var auth: FirebaseAuth
-    private val db = FirebaseFirestore.getInstance()
-    private val storage = FirebaseStorage.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
-    private val PICK_IMAGE = 200
-    private var imageUri: Uri? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentPerfilBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    private val avatars = listOf(
+        R.drawable.avatara,
+        R.drawable.avatarb,
+        R.drawable.avatarc,
+        R.drawable.avatard,
+        R.drawable.avatare,
+        R.drawable.avatarf
+    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding = FragmentPerfilBinding.bind(view)
 
-        auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
 
-        // 🟣 Registrar último inicio
-        registrarUltimoIngreso()
+        // Cargar avatar (invitado / local / Firestore)
+        cargarAvatar()
 
-        // 🟣 Mostrar datos del usuario
-        if (user != null) {
-            val email = user.email ?: "Correo no disponible"
-            val nombre = user.displayName ?: ""
+        if (user == null) {
+            // ================= INVITADO =================
+            binding.tvUserName.text = "Invitado"
+            binding.tvUserEmail.text = ""
 
-            // Si inició con Google y falta completar datos
-            if (nombre.isNotEmpty()) {
-                binding.tvUserEmail.text = nombre
-            } else {
-                binding.tvUserEmail.text = email
+            binding.btnLoginRegister.visibility = View.VISIBLE
+            binding.btnRegister.visibility = View.VISIBLE
+
+            binding.btnLogout.visibility = View.GONE
+            binding.btnEditUser.visibility = View.GONE
+            binding.btnResetPassword.visibility = View.GONE
+            binding.btnChangeEmail.visibility = View.GONE
+            binding.tvLastLogin.visibility = View.GONE
+
+            binding.btnLoginRegister.setOnClickListener {
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
             }
 
-            cargarFotoUsuario(user.uid)
-        }
+            binding.btnRegister.setOnClickListener {
+                startActivity(Intent(requireContext(), RegisterActivity::class.java))
+            }
 
-        // 🟣 Elegir nueva foto de perfil
-        binding.cardProfile.setOnClickListener {
-            seleccionarFoto()
-        }
+        } else {
+            // ================= USUARIO LOGUEADO =================
+            binding.tvUserName.text = user.displayName ?: "Usuario"
+            binding.tvUserEmail.text = user.email ?: ""
 
-        // 🟣 Botón EDITAR PERFIL → abre ProfileActivity
-        binding.btnEditUser.setOnClickListener {
-            val intent = Intent(requireContext(), ProfileActivity::class.java)
-            startActivity(intent)
-        }
+            binding.btnLoginRegister.visibility = View.GONE
+            binding.btnRegister.visibility = View.GONE
 
-        // 🟣 Botón Cerrar Sesión
-        binding.btnLogout.setOnClickListener {
-            cerrarSesion()
-        }
-    }
+            binding.btnLogout.visibility = View.VISIBLE
+            binding.btnEditUser.visibility = View.VISIBLE
+            binding.btnResetPassword.visibility = View.VISIBLE
+            binding.btnChangeEmail.visibility = View.VISIBLE
 
-    // --------------------------------------------------------------------
-    // 🟣 Seleccionar foto desde galería
-    private fun seleccionarFoto() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(intent, PICK_IMAGE)
-    }
+            mostrarUltimoLogin()
 
-    // --------------------------------------------------------------------
-    // 🟣 Resultado de selección de foto
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+            // Cambiar avatar
+            binding.cardProfile.setOnClickListener {
+                mostrarDialogoAvatares()
+            }
 
-        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
-            imageUri = data?.data
+            // 🔹 Editar perfil → ActivityProfile
+            binding.btnEditUser.setOnClickListener {
+                startActivity(
+                    Intent(requireContext(), ProfileActivity::class.java)
+                )
+            }
 
-            binding.ivUserProfile.setImageURI(imageUri)
+            // 🔹 Restablecer contraseña → ForgotPasswordActivity
+            binding.btnResetPassword.setOnClickListener {
+                startActivity(
+                    Intent(requireContext(), ForgotPasswordActivity::class.java)
+                )
+            }
 
-            auth.currentUser?.let {
-                subirFotoAFirebase(it.uid)
+            // 🔹 Cambiar correo electrónico → ChangeEmailActivity
+            binding.btnChangeEmail.setOnClickListener {
+                startActivity(
+                    Intent(requireContext(), ChangeEmailActivity::class.java)
+                )
+            }
+
+            // Cerrar sesión
+            binding.btnLogout.setOnClickListener {
+                cerrarSesion()
             }
         }
     }
 
-    // --------------------------------------------------------------------
-    // 🟣 Subir foto al Storage y guardar URL en Firestore
-    private fun subirFotoAFirebase(uid: String) {
-        val ref = storage.reference.child("usuarios/$uid/perfil.jpg")
+    // ===================== AVATAR =====================
 
-        imageUri?.let { uri ->
-            ref.putFile(uri)
-                .addOnSuccessListener {
-                    ref.downloadUrl.addOnSuccessListener { url ->
-                        db.collection("usuarios").document(uid)
-                            .update("foto", url.toString())
-                    }
-                }
+    private fun mostrarDialogoAvatares() {
+        val gridView = GridView(requireContext())
+        gridView.numColumns = 3
+        gridView.adapter = AvatarAdapter(requireContext(), avatars)
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Elige tu avatar")
+            .setView(gridView)
+            .create()
+
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            val selectedAvatar = avatars[position]
+            binding.ivUserProfile.setImageResource(selectedAvatar)
+            guardarAvatar(selectedAvatar)
+            dialog.dismiss()
         }
+
+        dialog.show()
     }
 
-    // --------------------------------------------------------------------
-    // 🟣 Cargar foto desde Firestore
-    private fun cargarFotoUsuario(uid: String) {
-        db.collection("usuarios").document(uid).get()
+    private fun guardarAvatar(resId: Int) {
+        val user = auth.currentUser ?: return
+        val avatarName = resources.getResourceEntryName(resId)
+
+        // Firestore (nube)
+        firestore.collection("users")
+            .document(user.uid)
+            .set(mapOf("avatar" to avatarName))
+
+        // Cache local
+        val prefs = requireContext()
+            .getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+
+        prefs.edit()
+            .putString("avatar_${user.uid}", avatarName)
+            .apply()
+    }
+
+    private fun cargarAvatar() {
+        val user = auth.currentUser
+
+        // Invitado
+        if (user == null) {
+            binding.ivUserProfile.setImageResource(R.drawable.avatarinvitado)
+            return
+        }
+
+        val prefs = requireContext()
+            .getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+
+        // Cache local
+        val localAvatar = prefs.getString("avatar_${user.uid}", null)
+        if (localAvatar != null) {
+            val resId = resources.getIdentifier(
+                localAvatar,
+                "drawable",
+                requireContext().packageName
+            )
+            if (resId != 0) binding.ivUserProfile.setImageResource(resId)
+        }
+
+        // Firestore (sincronización)
+        firestore.collection("users")
+            .document(user.uid)
+            .get()
             .addOnSuccessListener { doc ->
-                val url = doc.getString("foto")
-
-                if (!url.isNullOrEmpty()) {
-                    Glide.with(requireContext())
-                        .load(url)
-                        .placeholder(R.drawable.ic_user_placeholder)
-                        .into(binding.ivUserProfile)
+                val avatarName = doc.getString("avatar") ?: return@addOnSuccessListener
+                val resId = resources.getIdentifier(
+                    avatarName,
+                    "drawable",
+                    requireContext().packageName
+                )
+                if (resId != 0) {
+                    binding.ivUserProfile.setImageResource(resId)
+                    prefs.edit()
+                        .putString("avatar_${user.uid}", avatarName)
+                        .apply()
                 }
             }
     }
 
-    // --------------------------------------------------------------------
-    // 🟣 Registrar último ingreso
-    private fun registrarUltimoIngreso() {
-        val prefs = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putLong("ultimo_ingreso", System.currentTimeMillis()).apply()
+    // ===================== ÚLTIMO LOGIN =====================
+
+    private fun mostrarUltimoLogin() {
+        val prefs = requireContext()
+            .getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+
+        val time = prefs.getLong("ultimo_login", 0L)
+        if (time > 0) {
+            val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            binding.tvLastLogin.text = "Último inicio: ${sdf.format(Date(time))}"
+            binding.tvLastLogin.visibility = View.VISIBLE
+        }
     }
 
-    // --------------------------------------------------------------------
-    // 🟣 Cerrar sesión
+    // ===================== SESIÓN =====================
+
     private fun cerrarSesion() {
         auth.signOut()
-
-        // Limpia SharedPreferences
-        val prefs = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        prefs.edit().clear().apply()
-
-        // Redirige a Login
-        val intent = Intent(requireContext(), LoginActivity::class.java)
+        val intent = Intent(requireContext(), HomeActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
