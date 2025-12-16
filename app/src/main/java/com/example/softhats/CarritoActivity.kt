@@ -141,6 +141,10 @@ class CarritoActivity : AppCompatActivity() {
                 }
                 append("----------------------------\n")
                 append("💰 TOTAL: $${total}\n")
+                append("----------------------------\n")
+                append("¡Gracias por tu compra en Softhats!")
+                append("----------------------------\n")
+                append("En breve un vendedor se contactara contigo para coordinar el envío.")
             }
 
             // 📲 WhatsApp PRIMERO
