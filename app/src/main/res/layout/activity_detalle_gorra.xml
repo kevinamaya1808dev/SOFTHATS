@@ -5,161 +5,199 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#757575"
     tools:context=".DetalleGorraActivity">
-
-    <!-- Contenido Principal Desplazable -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="?attr/actionBarSize">
+        android:paddingBottom="100dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="100dp">
+            android:layout_height="wrap_content">
 
-            <!-- 1. Imagen de la Gorra -->
             <ImageView
                 android:id="@+id/ivFotoDetalle"
                 android:layout_width="match_parent"
-                android:layout_height="350dp"
+                android:layout_height="380dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
-            <!-- 2. Botón de Favorito (Corazón/Estrella) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@drawable/gradient_shadow_top"
+                app:layout_constraintTop_toTopOf="parent" />
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabFavorito"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginEnd="24dp"
                 android:src="@android:drawable/btn_star_big_off"
-                app:backgroundTint="@color/white"
+                app:backgroundTint="#FFFFFF"
                 app:tint="@null"
-                app:layout_constraintBottom_toBottomOf="@+id/ivFotoDetalle"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivFotoDetalle" />
+                app:elevation="6dp"
+                app:layout_constraintBottom_toTopOf="@+id/cardDetalles"
+                app:layout_constraintTop_toTopOf="@+id/cardDetalles"
+                app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- 3. Nombre -->
-            <TextView
-                android:id="@+id/tvNombreDetalle"
-                android:layout_width="0dp"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardDetalles"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="-30dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
                 app:layout_constraintTop_toBottomOf="@+id/ivFotoDetalle"
-                tools:text="GORRA TRIPLE BLACK EDITION" />
+                app:layout_constraintBottom_toBottomOf="parent">
 
-            <!-- 4. Precio -->
-            <TextView
-                android:id="@+id/tvPrecioDetalle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="22sp"
-                android:textStyle="italic"
-                android:textColor="@color/primary"
-                app:layout_constraintStart_toStartOf="@+id/tvNombreDetalle"
-                app:layout_constraintTop_toBottomOf="@+id/tvNombreDetalle"
-                tools:text="$1749.00 MXN" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-            <!-- 5. Descripción -->
-            <TextView
-                android:id="@+id/tvDescripcion"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="@color/black"
-                app:layout_constraintEnd_toEndOf="@+id/tvNombreDetalle"
-                app:layout_constraintStart_toStartOf="@+id/tvNombreDetalle"
-                app:layout_constraintTop_toBottomOf="@+id/tvPrecioDetalle"
-                tools:text="Aquí va la descripción detallada del producto..." />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BARBAS HATS"
+                        android:textColor="#9E9E9E"
+                        android:textSize="12sp"
+                        android:letterSpacing="0.1"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNombreDetalle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="GORRA TRIPLE BLACK EDITION"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#212121"
+                        android:lineSpacingMultiplier="1.1"/>
+
+                    <TextView
+                        android:id="@+id/tvPrecioDetalle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="$1,749.00 MXN"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#2E7D32" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EEEEEE"
+                        android:layout_marginVertical="20dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Descripción"
+                        android:textColor="#212121"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/tvDescripcion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingExtra="6dp"
+                        android:textColor="#616161"
+                        android:textSize="16sp"
+                        tools:text="Esta gorra edición limitada cuenta con acabados premium en color negro mate, ideal para combinar con cualquier outfit urbano. Fabricada con materiales de alta resistencia." />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.core.widget.NestedScrollView>
 
-    <!-- BARRA INFERIOR CON CONTROLES (Misma lógica de cantidad que ya tenías) -->
-    <com.google.android.material.bottomappbar.BottomAppBar
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTint="@color/white"
-        android:padding="16dp">
+        app:cardElevation="16dp"
+        app:cardCornerRadius="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp"
+            android:gravity="center_vertical"
+            android:background="#FFFFFF">
 
-            <!-- CONTADOR DE CANTIDAD (+ 1 -) -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:background="@drawable/ic_launcher_background"
-                android:backgroundTint="#F0F0F0"
-                android:layout_marginEnd="16dp"
-                android:padding="4dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <Button
+                <TextView
                     android:id="@+id/btnRestarDetalle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/fondo_boton_redondo"
+                    android:gravity="center"
                     android:text="-"
-                    android:textSize="18sp"
-                    android:textColor="@color/black"
-                    android:background="@android:color/transparent"
-                    android:padding="0dp"
-                    android:minWidth="0dp"
-                    style="?attr/borderlessButtonStyle"/>
+                    android:textColor="#673AB7"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <TextView
                     android:id="@+id/tvCantidadDetalle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
                     android:text="1"
+                    android:textColor="#212121"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:layout_marginHorizontal="12dp"/>
+                    android:textStyle="bold" />
 
-                <Button
+                <TextView
                     android:id="@+id/btnSumarDetalle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/fondo_boton_redondo"
+                    android:gravity="center"
                     android:text="+"
-                    android:textSize="18sp"
-                    android:textColor="@color/black"
-                    android:background="@android:color/transparent"
-                    android:padding="0dp"
-                    android:minWidth="0dp"
-                    style="?attr/borderlessButtonStyle"/>
+                    android:textColor="#673AB7"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
 
-            <!-- BOTÓN AÑADIR GRANDE -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
             <Button
                 android:id="@+id/btnAddCarrito"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
+                android:layout_width="180dp"
+                android:layout_height="55dp"
                 android:text="Añadir al Carrito"
                 android:textSize="16sp"
-                android:backgroundTint="@color/primary" />
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:backgroundTint="#FF5722"
+                app:cornerRadius="12dp"
+                app:elevation="4dp"/>
 
         </LinearLayout>
-
-    </com.google.android.material.bottomappbar.BottomAppBar>
+    </androidx.cardview.widget.CardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

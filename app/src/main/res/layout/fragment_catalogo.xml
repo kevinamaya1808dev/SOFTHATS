@@ -5,39 +5,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
     tools:context=".CatalogoFragment">
 
-    <!-- Título de la sección -->
     <TextView
         android:id="@+id/tvTituloCatalogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+
+        android:layout_marginStart="76dp"
+        android:layout_marginTop="24dp"
+        android:shadowColor="#000000"
+        android:shadowDx="4"
+
+        android:shadowDy="4"
+        android:shadowRadius="8"
         android:text="Explora nuestra colección"
-        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- LA LISTA DE GORRAS (RecyclerView) -->
+    <LinearLayout
+        android:id="@+id/linearLayoutBusqueda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo">
+
+        <EditText
+            android:id="@+id/etBuscar"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:background="@drawable/fondo_buscador_redondeado"
+            android:hint="Buscar gorras..."
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:maxLines="1"/>
+
+        <ImageButton
+            android:id="@+id/btnOrdenar"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="10dp"
+
+            android:src="@drawable/ic_sort"
+            android:background="@drawable/fondo_boton_negro"
+            app:tint="#FFFFFF"
+
+            android:padding="10dp"
+            android:scaleType="fitCenter"
+            android:elevation="4dp"/>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewGorras"
+        android:id="@+id/rvGorras"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:paddingHorizontal="8dp"
         android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutBusqueda"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloCatalogo"
         tools:listitem="@layout/item_gorra" />
 
-    <!-- Barra de carga (opcional, para que se vea pro) -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -5,41 +5,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#5C5C5C"
     tools:context=".CarritoActivity">
 
-    <!-- Título -->
     <TextView
         android:id="@+id/tvTituloCarrito"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="#333333"
         android:padding="16dp"
-        android:text="Mi Carrito de Compras"
+        android:text="Mi Carrito"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:textStyle="bold"
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- LISTA DE PRODUCTOS (Aquí se verán los items que diseñaste antes) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCarrito"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="8dp"
-        android:clipToPadding="false"
         app:layout_constraintBottom_toTopOf="@+id/containerTotal"
         app:layout_constraintTop_toBottomOf="@+id/tvTituloCarrito"
         tools:listitem="@layout/item_carrito" />
 
-    <!-- MENSAJE DE CARRITO VACÍO (Oculto por defecto) -->
     <TextView
         android:id="@+id/tvVacio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tu carrito está vacío 🛒"
+        android:textColor="#E0E0E0"
         android:textSize="18sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -47,14 +44,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- BARRA INFERIOR CON TOTAL -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/containerTotal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="#333333"
         android:elevation="16dp"
-        android:padding="16dp"
+        android:padding="24dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
@@ -62,18 +58,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total a Pagar:"
-            android:textSize="18sp"
+            android:textColor="#BDBDBD"
+            android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tvGranTotal"/>
 
         <TextView
             android:id="@+id/tvGranTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="$ 0.00"
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:textColor="#4CAF50"
+            android:textColor="#D4AF37"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -81,9 +79,12 @@
             android:id="@+id/btnPagar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="ENVIAR PEDIDO"
-            android:textSize="18sp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#5C5C5C"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGranTotal" />
 

@@ -2,109 +2,150 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fondo_degradado"
+    android:background="@drawable/icono_protec"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="32dp"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:padding="24dp">
 
-        <!-- Título principal -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Iniciar sesión"
-            android:textSize="28sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
+        <!-- LOGO SUPERIOR -->
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="120dp"
+            android:src="@drawable/icono"
             android:layout_marginTop="40dp"
-            android:layout_marginBottom="24dp"/>
+            android:adjustViewBounds="true" />
 
-        <!-- Campo de correo -->
-        <EditText
-            android:id="@+id/etEmail"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Correo electrónico"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="20dp"
-            android:textColorHint="@color/secondary"
-            android:layout_marginBottom="16dp"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/black"/>
-
-        <!-- Campo de contraseña -->
-        <EditText
-            android:id="@+id/etContrasena"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:hint="Contraseña"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="20dp"
-            android:textColorHint="@color/secondary"
-            android:layout_marginBottom="24dp"
-            android:inputType="textPassword"
-            android:textColor="@color/black"/>
-
-        <!-- Botón principal -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Iniciar sesión"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/circulo_blanco"/>
-
-        <!-- Enlace de registro -->
-        <TextView
-            android:id="@+id/tvIrRegistro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¿No tienes cuenta? Regístrate"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp"/>
-
-        <!-- Separador -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="O continúa con"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:layout_marginBottom="12dp"/>
-
-        <!-- Botón de Google -->
+        <!-- TARJETA DE LOGIN -->
         <LinearLayout
-            android:id="@+id/btnGoogleSignIn"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/edittext_borde"
-            android:paddingHorizontal="16dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#66000000"
+            android:padding="20dp"
+            android:layout_marginTop="24dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_google"
-                android:layout_marginEnd="10dp"/>
+            <!-- CORREO -->
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Correo electrónico"
+                android:background="@android:color/transparent"
+                android:paddingHorizontal="16dp"
+                android:textColor="@android:color/white"
+                android:textColorHint="#D0D0D0"
+                android:inputType="textEmailAddress"
+                android:layout_marginBottom="16dp" />
 
+            <!-- CONTRASEÑA + OJO -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:layout_marginBottom="16dp">
+
+                <EditText
+                    android:id="@+id/etContrasena"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Contraseña"
+                    android:background="@android:color/transparent"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#D0D0D0"
+                    android:inputType="textPassword"
+                    android:paddingEnd="50dp" />
+
+                <ImageView
+                    android:id="@+id/btnTogglePassword"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_visibility_off" />
+            </RelativeLayout>
+
+            <!-- OLVIDASTE TU CONTRASEÑA -->
             <TextView
+                android:id="@+id/tvForgotPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Iniciar sesión con Google"
-                android:textColor="@color/secondary"
-                android:textStyle="bold"/>
+                android:text="¿Olvidaste tu contraseña?"
+                android:textColor="#D0D0D0"
+                android:textSize="14sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp" />
+
+            <!-- BOTÓN INICIAR SESIÓN -->
+            <TextView
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Iniciar sesión"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:background="#505050"
+                android:padding="12dp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- SEPARADOR LÍNEA → CUADRITO → LÍNEA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#80FFFFFF" />
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@android:color/white"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginTop="3dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#80FFFFFF" />
+            </LinearLayout>
+
+            <!-- REGISTRO -->
+            <TextView
+                android:id="@+id/tvIrRegistro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¿No tienes cuenta? Regístrate"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp" />
+
+            <!-- GOOGLE -->
+            <ImageView
+                android:id="@+id/btnGoogleSignIn"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_google"
+                android:background="@drawable/circulo_blanco"
+                android:padding="10dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp" />
         </LinearLayout>
 
-        <!-- Espaciador inferior -->
         <View
             android:layout_width="match_parent"
             android:layout_height="60dp" />

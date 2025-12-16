@@ -1,88 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
     app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
-        <!-- Nombre del Producto -->
+        <ImageView
+            android:id="@+id/ivImagenCarrito"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="Imagen producto"
+            android:scaleType="centerCrop"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:drawable/ic_menu_gallery" />
+
         <TextView
             android:id="@+id/tvNombreCarrito"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Gorra Dandy Summer"
-            android:textSize="18sp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Gorra Ejemplo"
+            android:textColor="#212121"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnEliminar" />
+            app:layout_constraintEnd_toStartOf="@+id/btnEliminar"
+            app:layout_constraintStart_toEndOf="@+id/ivImagenCarrito"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Precio Unitario -->
         <TextView
             android:id="@+id/tvPrecioCarrito"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$ 1,599.00"
-            android:textSize="16sp"
-            android:textColor="#4CAF50"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="4dp"
+            android:text="$ 0.00"
+            android:textColor="#2E7D32"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/tvNombreCarrito"
             app:layout_constraintTop_toBottomOf="@+id/tvNombreCarrito" />
 
-        <!-- Botón Eliminar (Basura) -->
-        <ImageButton
+        <ImageView
             android:id="@+id/btnEliminar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_delete"
-            app:tint="#F44336"
+            app:tint="#D90000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Controles de Cantidad (+ 1 -) -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNombreCarrito">
+            app:layout_constraintTop_toBottomOf="@+id/tvPrecioCarrito">
 
-            <Button
+            <TextView
                 android:id="@+id/btnRestar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:text="-"
-                android:padding="0dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                android:textColor="#673AB7"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/fondo_boton_redondo"
+                android:clickable="true"
+                android:focusable="true" />
 
             <TextView
                 android:id="@+id/tvCantidad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="14dp"
                 android:text="1"
+                android:textColor="#000000"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginHorizontal="12dp"/>
+                android:textStyle="bold" />
 
-            <Button
+            <TextView
                 android:id="@+id/btnSumar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:text="+"
-                android:padding="0dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-        </LinearLayout>
+                android:textColor="#673AB7"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:background="@drawable/fondo_boton_redondo"
+                android:clickable="true"
+                android:focusable="true" />
 
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
