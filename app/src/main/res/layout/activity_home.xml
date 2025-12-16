@@ -51,7 +51,7 @@
             android:id="@+id/btnCarritoTop"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_shopping_cart"
+            android:src="@drawable/ic_nav_carrito"
             app:tint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
