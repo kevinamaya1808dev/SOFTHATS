@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -27,58 +28,77 @@ class CarritoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityCarritoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 1. Inicializar Base de Datos
         database = AppDatabase.getDatabase(this)
 
+        // 2. Configurar el RecyclerView (Lista)
         setupRecyclerView()
+
+        // 3. Observar los datos del carrito en tiempo real
         observarCarrito()
 
-        // Botón ÚNICO: Guarda Ticket y Envia a WhatsApp
+        // 4. Botón Pagar: Llama a la función completa (Ticket + WhatsApp + Vaciar)
         binding.btnPagar.setOnClickListener {
             procesarPedidoCompleto()
         }
     }
 
     private fun setupRecyclerView() {
+        // Inicializamos el adaptador con las acciones para cada botón
         adapter = CarritoAdapter(
-            onSumarClick = { actualizarCantidad(it, 1) },
-            onRestarClick = { actualizarCantidad(it, -1) },
-            onEliminarClick = { eliminarItem(it) }
+            onSumarClick = { item -> actualizarCantidad(item, 1) },
+            onRestarClick = { item -> actualizarCantidad(item, -1) },
+            onEliminarClick = { item -> eliminarItem(item) }
         )
+
         binding.rvCarrito.layoutManager = LinearLayoutManager(this)
         binding.rvCarrito.adapter = adapter
     }
 
     private fun observarCarrito() {
+        // Usamos Flow para recibir actualizaciones automáticas si algo cambia en la BD
         lifecycleScope.launch {
             database.carritoDao().obtenerCarrito().collect { items ->
+                // Actualizamos la lista visual
                 adapter.submitList(items)
+
+                // Calculamos y mostramos el total
                 actualizarTotal(items)
-                binding.tvVacio.visibility =
-                    if (items.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+
+                // Mostrar u ocultar mensaje de "Vacío"
+                binding.tvVacio.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+                binding.rvCarrito.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
             }
         }
     }
 
     private fun actualizarTotal(items: List<CarritoEntity>) {
-        val total = items.sumOf { it.total }
-        binding.tvGranTotal.text = "$ ${String.format("%,.2f", total)}"
+        var granTotal = 0.0
+        for (item in items) {
+            granTotal += item.total
+        }
+        binding.tvGranTotal.text = "$ ${String.format(Locale.getDefault(), "%,.2f", granTotal)}"
     }
+
+    // --- LÓGICA DE LOS BOTONES ---
 
     private fun actualizarCantidad(item: CarritoEntity, cambio: Int) {
         val nuevaCantidad = item.cantidad + cambio
+
         if (nuevaCantidad > 0) {
-            val actualizado = item.copy(
+            // Actualizamos cantidad y recalcula el subtotal
+            val itemActualizado = item.copy(
                 cantidad = nuevaCantidad,
-                total = nuevaCantidad * item.precioUnitario
+                total = item.precioUnitario * nuevaCantidad
             )
             lifecycleScope.launch(Dispatchers.IO) {
-                database.carritoDao().insertarOActualizar(actualizado)
+                database.carritoDao().insertarOActualizar(itemActualizado)
             }
         } else {
+            // Si la cantidad llega a 0, eliminamos
             eliminarItem(item)
         }
     }
@@ -93,12 +113,12 @@ class CarritoActivity : AppCompatActivity() {
     }
 
     // ------------------------------------------------------------
-    // 🟢 FUNCIÓN PRINCIPAL: TICKET + WHATSAPP (FORMATO ORIGINAL)
+    // 🟢 FUNCIÓN PRINCIPAL: TICKET + WHATSAPP + VACIAR CARRITO
     // ------------------------------------------------------------
     private fun procesarPedidoCompleto() {
         lifecycleScope.launch(Dispatchers.IO) {
 
-            // 1. Obtener productos
+            // 1. Obtener productos (Una sola vez para generar el ticket)
             val carrito = database.carritoDao().obtenerCarrito().first()
 
             if (carrito.isEmpty()) {
@@ -110,14 +130,10 @@ class CarritoActivity : AppCompatActivity() {
 
             // 2. Preparar Fechas
             val fechaVisual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
-
-            // Nombre seguro para archivo (sin / ni :)
             val formatoNombre = SimpleDateFormat("dd-MMM-yyyy_HH-mm-ss", Locale.getDefault())
             val nombreArchivo = "Ticket_${formatoNombre.format(Date())}.txt"
 
-            // ---------------------------------------------------------
-            // PASO A: GENERAR ARCHIVO DE TEXTO (REQUERIMIENTO ESCOLAR)
-            // ---------------------------------------------------------
+            // 3. Generar Archivo Ticket
             val sbTicket = StringBuilder()
             sbTicket.appendLine("----- TICKET HATSGO -----")
             sbTicket.appendLine("Fecha: $fechaVisual")
@@ -139,41 +155,37 @@ class CarritoActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
 
-            // ---------------------------------------------------------
-            // PASO B: MENSAJE DE WHATSAPP (TU ESTRUCTURA ORIGINAL)
-            // ---------------------------------------------------------
+            // 4. Generar Mensaje WhatsApp
             val sbWhatsApp = StringBuilder()
-            var totalFinal = 0.0
-
             sbWhatsApp.append("*NUEVO PEDIDO HATSGO* 🧢\n")
             sbWhatsApp.append("📅 Fecha: $fechaVisual\n")
             sbWhatsApp.append("----------------------------\n")
-
             for (item in carrito) {
-                // Formato original: ▪️ 2x *Gorra Nike*
                 sbWhatsApp.append("▪️ ${item.cantidad}x *${item.nombre}*\n")
                 sbWhatsApp.append("   Subtotal: $${item.total}\n")
-                totalFinal += item.total
             }
-
             sbWhatsApp.append("----------------------------\n")
-            sbWhatsApp.append("💰 *TOTAL A PAGAR: $${totalFinal}*\n")
+            sbWhatsApp.append("💰 *TOTAL A PAGAR: $${totalTicket}*\n")
             sbWhatsApp.append("----------------------------\n")
             sbWhatsApp.append("EN BREVE UN VENDEDOR SE CONTACTARA CONTIGO .")
 
-            // 3. Ejecutar acciones en pantalla
-            withContext(Dispatchers.Main) {
-                // Aviso discreto de que se guardó el ticket
-                Toast.makeText(this@CarritoActivity, "Ticket guardado: $nombreArchivo", Toast.LENGTH_LONG).show()
+            // 5. VACIAR CARRITO
+            // Esto borra la BD después de procesar el pedido
+            database.carritoDao().vaciarCarrito()
 
-                // Abrir WhatsApp con el mensaje original
+            // 6. Volver al hilo principal para abrir WhatsApp
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@CarritoActivity, "Pedido procesado. Ticket guardado.", Toast.LENGTH_LONG).show()
                 abrirWhatsApp(sbWhatsApp.toString())
+
+                // Opcional: Cerrar actividad para volver al Home vacio
+                finish()
             }
         }
     }
 
     private fun abrirWhatsApp(mensaje: String) {
-        val numeroVendedor = "525645119567"
+        val numeroVendedor = "525645119567" // Tu número
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse("https://api.whatsapp.com/send?phone=$numeroVendedor&text=${Uri.encode(mensaje)}")

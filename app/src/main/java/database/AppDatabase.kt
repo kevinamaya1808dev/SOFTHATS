@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 // IMPORTANTE: Subimos la versión a 3 y agregamos FavoritoEntity a la lista
-@Database(entities = [GorraEntity::class, CarritoEntity::class, FavoritoEntity::class], version = 3)
+@Database(entities = [GorraEntity::class, CarritoEntity::class, FavoritoEntity::class], version = 4)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun gorraDao(): GorraDao

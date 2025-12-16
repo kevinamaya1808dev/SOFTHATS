@@ -1,5 +1,6 @@
 package com.example.softhats
 
+import android.graphics.Color // IMPORTANTE: Agregado para manejar los colores
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -9,7 +10,9 @@ import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.CarritoEntity
 import com.example.softhats.database.FavoritoEntity
 import com.example.softhats.databinding.ActivityDetalleGorraBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class DetalleGorraActivity : AppCompatActivity() {
@@ -17,7 +20,7 @@ class DetalleGorraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetalleGorraBinding
     private lateinit var db: AppDatabase
     private var cantidadSeleccionada = 1
-    private var esFavorito = false // Variable para saber si ya le dio like
+    private var esFavorito = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +39,13 @@ class DetalleGorraActivity : AppCompatActivity() {
         db = AppDatabase.getDatabase(this)
 
         // --- LÓGICA FAVORITOS ---
-
-        // 1. Checar estado inicial: ¿Esta gorra ya es favorita?
         verificarFavorito(nombre.hashCode())
 
-        // 2. Configurar clic en el botón flotante (Corazón/Estrella)
         binding.fabFavorito.setOnClickListener {
             toggleFavorito(nombre, precio, descripcion, imagenNombre)
         }
 
-        // --- LÓGICA CARRITO (Suma, Resta y Añadir) ---
+        // --- LÓGICA CARRITO ---
 
         binding.btnSumarDetalle.setOnClickListener {
             cantidadSeleccionada++
@@ -59,12 +59,12 @@ class DetalleGorraActivity : AppCompatActivity() {
             }
         }
 
+        // Botón agregar: Llama a la función que suma cantidades
         binding.btnAddCarrito.setOnClickListener {
-            agregarAlCarrito(nombre, precio, cantidadSeleccionada)
+            agregarAlCarrito(nombre, precio, cantidadSeleccionada, imagenNombre)
         }
     }
 
-    // Función para consultar a la BD si ya existe esta gorra en favoritos
     private fun verificarFavorito(id: Int) {
         lifecycleScope.launch {
             esFavorito = db.favoritoDao().esFavorito(id)
@@ -72,50 +72,75 @@ class DetalleGorraActivity : AppCompatActivity() {
         }
     }
 
-    // Función para Guardar o Borrar de favoritos
     private fun toggleFavorito(nombre: String, precio: Double, desc: String, img: String) {
         lifecycleScope.launch {
-            val id = nombre.hashCode() // Usamos el hash del nombre como ID único
-
+            val id = nombre.hashCode()
             if (esFavorito) {
-                // Si ya era favorito, lo borramos (Des-likear)
                 db.favoritoDao().eliminarFavorito(id)
                 esFavorito = false
                 Toast.makeText(this@DetalleGorraActivity, "Eliminado de favoritos", Toast.LENGTH_SHORT).show()
             } else {
-                // Si no era favorito, lo guardamos (Likear)
                 val fav = FavoritoEntity(id, nombre, precio, desc, img)
                 db.favoritoDao().agregarFavorito(fav)
                 esFavorito = true
                 Toast.makeText(this@DetalleGorraActivity, "¡Añadido a favoritos!", Toast.LENGTH_SHORT).show()
             }
-            // Actualizamos el dibujo de la estrella
             actualizarIconoFavorito()
         }
     }
 
-    // Función visual para pintar la estrella llena o vacía
+    // 🟡 FUNCIÓN MODIFICADA: Controla el color EXACTO de la estrella
     private fun actualizarIconoFavorito() {
         if (esFavorito) {
-            binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_on) // Estrella amarilla
+            // Caso SI es favorito: Icono lleno + Color AMARILLO DORADO
+            binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_on)
+            binding.fabFavorito.setColorFilter(Color.parseColor("#FFC107"))
         } else {
-            binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_off) // Estrella gris
+            // Caso NO es favorito: Icono vacío + Color GRIS
+            binding.fabFavorito.setImageResource(android.R.drawable.btn_star_big_off)
+            binding.fabFavorito.setColorFilter(Color.parseColor("#9E9E9E"))
         }
     }
 
-    // --- Funciones de Carrito y Visualización ---
-    private fun agregarAlCarrito(nombre: String, precio: Double, cantidad: Int) {
-        val itemCarrito = CarritoEntity(
-            idProducto = nombre.hashCode(),
-            nombre = nombre,
-            precioUnitario = precio,
-            cantidad = cantidad,
-            total = precio * cantidad
-        )
-        lifecycleScope.launch {
+    // 🟢 FUNCIÓN MEJORADA: Suma cantidades si ya existe
+    private fun agregarAlCarrito(nombre: String, precio: Double, cantidadNueva: Int, imagen: String) {
+        val id = nombre.hashCode()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            // 1. Preguntar: ¿Ya existe esta gorra en el carrito?
+            val productoExistente = db.carritoDao().obtenerProducto(id)
+
+            val cantidadFinal = if (productoExistente != null) {
+                // Si existe, sumamos lo que había + lo nuevo
+                productoExistente.cantidad + cantidadNueva
+            } else {
+                // Si no existe, usamos solo lo nuevo
+                cantidadNueva
+            }
+
+            // 2. Creamos el objeto con la cantidad actualizada
+            val itemCarrito = CarritoEntity(
+                idProducto = id,
+                nombre = nombre,
+                precioUnitario = precio,
+                cantidad = cantidadFinal,
+                total = precio * cantidadFinal, // Recalculamos el total
+                imagen = imagen // Incluimos la imagen
+            )
+
+            // 3. Guardamos
             db.carritoDao().insertarOActualizar(itemCarrito)
-            Toast.makeText(this@DetalleGorraActivity, "Agregado al carrito", Toast.LENGTH_SHORT).show()
-            finish()
+
+            // 4. Avisamos en el hilo principal
+            withContext(Dispatchers.Main) {
+                val mensaje = if (productoExistente != null) {
+                    "Se actualizó la cantidad a $cantidadFinal"
+                } else {
+                    "Agregado al carrito"
+                }
+                Toast.makeText(this@DetalleGorraActivity, mensaje, Toast.LENGTH_SHORT).show()
+                finish() // Cierra la ventana y vuelve al catálogo
+            }
         }
     }
 

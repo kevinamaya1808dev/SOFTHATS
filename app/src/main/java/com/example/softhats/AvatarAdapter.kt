@@ -18,11 +18,13 @@ class AvatarAdapter(
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val imageView = ImageView(context)
+        val imageView = convertView as? ImageView ?: ImageView(context)
+
         imageView.setImageResource(avatars[position])
-        imageView.layoutParams = ViewGroup.LayoutParams(200, 200)
+        imageView.layoutParams = ViewGroup.LayoutParams(220, 220)
         imageView.scaleType = ImageView.ScaleType.CENTER_CROP
         imageView.setPadding(16, 16, 16, 16)
+
         return imageView
     }
 }

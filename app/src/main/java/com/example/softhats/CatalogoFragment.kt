@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.softhats.databinding.FragmentCatalogoBinding // Asegúrate que este nombre coincida con tu XML
+import com.example.softhats.databinding.FragmentCatalogoBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Locale
 

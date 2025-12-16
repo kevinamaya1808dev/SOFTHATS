@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.recyclerview.widget.RecyclerView
-// --- IMPORTACIONES ---
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.CarritoEntity
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +20,7 @@ import kotlinx.coroutines.withContext
 class GorraAdapter(private val context: Context, private val gorraList: ArrayList<Gorra>) :
     RecyclerView.Adapter<GorraAdapter.GorraViewHolder>() {
 
+    // Variable para el clic en la foto (ir a detalle)
     var onItemClick: ((Gorra) -> Unit)? = null
 
     // 1. EL VIEWHOLDER
@@ -28,9 +28,11 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         val ivGorra: ImageView = itemView.findViewById(R.id.ivGorra)
         val tvNombreGorra: TextView = itemView.findViewById(R.id.tvNombreGorra)
         val tvPrecioGorra: TextView = itemView.findViewById(R.id.tvPrecioGorra)
+        // 🟢 CORRECCIÓN: Faltaba declarar este botón
         val btnCarrito: View = itemView.findViewById(R.id.btnCarrito)
 
         init {
+            // Clic en la tarjeta lleva al detalle
             itemView.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -54,15 +56,15 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         return gorraList.size
     }
 
-    // 4. ON BIND VIEWHOLDER
+    // 4. ON BIND VIEWHOLDER (Ahora solo hay uno, limpio y correcto)
     override fun onBindViewHolder(holder: GorraViewHolder, position: Int) {
         val currentGorra = gorraList[position]
 
-        // Datos visuales
+        // A. Datos visuales
         holder.tvNombreGorra.text = currentGorra.nombre
         holder.tvPrecioGorra.text = "$ ${currentGorra.precio}"
 
-        // Lógica de imagen
+        // B. Cargar Imagen
         val imageName = currentGorra.imagen_nombre
         val resourceId = context.resources.getIdentifier(
             imageName, "drawable", context.packageName
@@ -72,62 +74,63 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
             holder.ivGorra.setImageResource(resourceId)
         } else {
             holder.ivGorra.setImageResource(R.drawable.ic_launcher_foreground)
+            Log.w("GorraAdapter", "No se encontró la imagen: $imageName")
         }
 
-        // ------------------------------------------------------------------
-        // LÓGICA CORREGIDA: BOTÓN AÑADIR AL CARRITO
-        // ------------------------------------------------------------------
+        // C. Lógica del Botón Carrito (Suma Inteligente)
         holder.btnCarrito.setOnClickListener {
 
-            val cantidadInicial = 1
-
-            // 1. Convertir precio de forma segura
+            val cantidadAGregar = 1
             val precioFinal: Double = try {
                 currentGorra.precio.toString().toDouble()
-            } catch (e: NumberFormatException) {
-                0.0
-            }
+            } catch (e: NumberFormatException) { 0.0 }
 
-            // 2. Crear objeto (CORREGIDO EL ERROR DE STRING?)
-            val productoParaCarrito = CarritoEntity(
-                // Si el nombre es nulo, usamos 0 como ID. Si no, usamos su hash.
-                idProducto = currentGorra.nombre?.hashCode() ?: 0,
+            val nombreSeguro = currentGorra.nombre ?: "Gorra Sin Nombre"
+            val idProducto = nombreSeguro.hashCode()
+            val imagenSegura = currentGorra.imagen_nombre ?: ""
 
-                // Si el nombre es nulo, ponemos un texto por defecto
-                nombre = currentGorra.nombre ?: "Gorra Sin Nombre",
-
-                precioUnitario = precioFinal,
-                cantidad = cantidadInicial,
-                total = precioFinal * cantidadInicial
-            )
-
-            // 3. Guardar en BD (Usando Corrutinas de forma segura)
-            // Intentamos usar el ciclo de vida del contexto (si es una Activity)
-            // Si falla, usamos GlobalScope como respaldo rápido.
-            val scope = (context as? LifecycleOwner)?.lifecycleScope
-                ?: kotlinx.coroutines.GlobalScope
+            // Usamos Corrutinas
+            val scope = (context as? LifecycleOwner)?.lifecycleScope ?: kotlinx.coroutines.GlobalScope
 
             scope.launch(Dispatchers.IO) {
                 try {
-                    // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE DE LA BASE DE DATOS ---
-                    // No uses .build() aquí adentro. Usa la instancia Singleton.
                     val db = AppDatabase.getDatabase(context)
 
-                    // Asegúrate que tu DAO tenga el método 'insert' (o 'insertarOActualizar' si así lo llamaste)
+                    // 1. Verificar si ya existe
+                    val productoExistente = db.carritoDao().obtenerProducto(idProducto)
+
+                    val cantidadFinal = if (productoExistente != null) {
+                        productoExistente.cantidad + cantidadAGregar
+                    } else {
+                        cantidadAGregar
+                    }
+
+                    // 2. Crear objeto actualizado
+                    val productoParaCarrito = CarritoEntity(
+                        idProducto = idProducto,
+                        nombre = nombreSeguro,
+                        precioUnitario = precioFinal,
+                        cantidad = cantidadFinal,
+                        total = precioFinal * cantidadFinal,
+                        imagen = imagenSegura
+                    )
+
+                    // 3. Guardar
                     db.carritoDao().insertarOActualizar(productoParaCarrito)
 
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            context,
-                            "Agregado: ${currentGorra.nombre}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        val mensaje = if (productoExistente != null) {
+                            "Cantidad actualizada: $cantidadFinal"
+                        } else {
+                            "Agregado al carrito"
+                        }
+                        Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
                     }
 
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Error al guardar", Toast.LENGTH_SHORT).show()
-                        Log.e("GorraAdapter", "Error: ${e.message}")
+                        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Log.e("GorraAdapter", "Error al guardar: ${e.message}")
                     }
                 }
             }
