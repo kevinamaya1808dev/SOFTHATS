@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("kotlin-kapt") // Necesario para Glide y Room
+    id("kotlin-kapt")
 }
 
 android {
@@ -53,6 +53,9 @@ dependencies {
     // ------------------ GOOGLE SIGN IN ------------------
     implementation("com.google.android.gms:play-services-auth:21.1.0")
 
+    // ------------------ QR (ZXING) ------------------
+    implementation("com.google.zxing:core:3.5.3")
+
     // ------------------ GLIDE ------------------
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
@@ -72,8 +75,7 @@ dependencies {
     // ------------------ MAPS & LOCATION ------------------
     implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
-    implementation("com.android.volley:volley:1.2.1") // <-- Add this line
-
+    implementation("com.android.volley:volley:1.2.1")
 
     // ------------------ ROOM ------------------
     val room_version = "2.6.1"
