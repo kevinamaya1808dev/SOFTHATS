@@ -65,6 +65,7 @@ class LoginActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+
                     startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                 } else {
