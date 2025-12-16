@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -13,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.softhats.database.AppDatabase
 import com.example.softhats.database.CarritoEntity
+import com.example.softhats.database.FavoritoEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,8 +30,9 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         val ivGorra: ImageView = itemView.findViewById(R.id.ivGorra)
         val tvNombreGorra: TextView = itemView.findViewById(R.id.tvNombreGorra)
         val tvPrecioGorra: TextView = itemView.findViewById(R.id.tvPrecioGorra)
-        // 🟢 CORRECCIÓN: Faltaba declarar este botón
         val btnCarrito: View = itemView.findViewById(R.id.btnCarrito)
+        // 🟢 NUEVO: Declaramos el botón de favorito
+        val btnFavorito: ImageButton = itemView.findViewById(R.id.btnFavorito)
 
         init {
             // Clic en la tarjeta lleva al detalle
@@ -56,15 +59,15 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
         return gorraList.size
     }
 
-    // 4. ON BIND VIEWHOLDER (Ahora solo hay uno, limpio y correcto)
+    // 4. ON BIND VIEWHOLDER
     override fun onBindViewHolder(holder: GorraViewHolder, position: Int) {
         val currentGorra = gorraList[position]
 
-        // A. Datos visuales
+        // --- A. Datos visuales ---
         holder.tvNombreGorra.text = currentGorra.nombre
         holder.tvPrecioGorra.text = "$ ${currentGorra.precio}"
 
-        // B. Cargar Imagen
+        // --- B. Cargar Imagen ---
         val imageName = currentGorra.imagen_nombre
         val resourceId = context.resources.getIdentifier(
             imageName, "drawable", context.packageName
@@ -77,7 +80,65 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
             Log.w("GorraAdapter", "No se encontró la imagen: $imageName")
         }
 
-        // C. Lógica del Botón Carrito (Suma Inteligente)
+        // Preparar datos comunes para BD
+        val nombreSeguro = currentGorra.nombre ?: "Gorra Sin Nombre"
+        val idProducto = nombreSeguro.hashCode()
+        val imagenSegura = currentGorra.imagen_nombre ?: ""
+
+        // Scope para corrutinas
+        val scope = (context as? LifecycleOwner)?.lifecycleScope ?: kotlinx.coroutines.GlobalScope
+        val db = AppDatabase.getDatabase(context)
+
+        // ==================================================================
+        // 🌟 C. LÓGICA DE FAVORITOS (ESTRELLA) - NUEVO
+        // ==================================================================
+
+        // 1. Checar estado inicial (¿Está en favoritos?) para pintar la estrella
+        scope.launch(Dispatchers.IO) {
+            val esFavorito = db.favoritoDao().esFavorito(idProducto)
+
+            withContext(Dispatchers.Main) {
+                if (esFavorito) {
+                    holder.btnFavorito.setImageResource(android.R.drawable.btn_star_big_on) // ⭐ Amarilla
+                } else {
+                    holder.btnFavorito.setImageResource(android.R.drawable.btn_star_big_off) // ☆ Gris
+                }
+            }
+        }
+
+        // 2. Clic en la Estrella (Guardar o Borrar)
+        holder.btnFavorito.setOnClickListener {
+            scope.launch(Dispatchers.IO) {
+                val yaEsFavorito = db.favoritoDao().esFavorito(idProducto)
+
+                if (yaEsFavorito) {
+                    // Si ya existe -> Borrar
+                    db.favoritoDao().eliminarFavorito(idProducto)
+                    withContext(Dispatchers.Main) {
+                        holder.btnFavorito.setImageResource(android.R.drawable.btn_star_big_off)
+                        Toast.makeText(context, "Eliminado de favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Si no existe -> Guardar
+                    val nuevoFav = FavoritoEntity(
+                        idProducto = idProducto,
+                        nombre = nombreSeguro,
+                        precio = try { currentGorra.precio.toString().toDouble() } catch (e: Exception) { 0.0 },
+                        descripcion = currentGorra.descripcion ?: "Sin descripción",
+                        imagenNombre = imagenSegura
+                    )
+                    db.favoritoDao().agregarFavorito(nuevoFav)
+                    withContext(Dispatchers.Main) {
+                        holder.btnFavorito.setImageResource(android.R.drawable.btn_star_big_on)
+                        Toast.makeText(context, "¡Añadido a favoritos!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        // ==================================================================
+        // 🛒 D. LÓGICA DEL CARRITO (SUMA INTELIGENTE) - SE MANTIENE IGUAL
+        // ==================================================================
         holder.btnCarrito.setOnClickListener {
 
             val cantidadAGregar = 1
@@ -85,18 +146,9 @@ class GorraAdapter(private val context: Context, private val gorraList: ArrayLis
                 currentGorra.precio.toString().toDouble()
             } catch (e: NumberFormatException) { 0.0 }
 
-            val nombreSeguro = currentGorra.nombre ?: "Gorra Sin Nombre"
-            val idProducto = nombreSeguro.hashCode()
-            val imagenSegura = currentGorra.imagen_nombre ?: ""
-
-            // Usamos Corrutinas
-            val scope = (context as? LifecycleOwner)?.lifecycleScope ?: kotlinx.coroutines.GlobalScope
-
             scope.launch(Dispatchers.IO) {
                 try {
-                    val db = AppDatabase.getDatabase(context)
-
-                    // 1. Verificar si ya existe
+                    // 1. Verificar si ya existe en el carrito
                     val productoExistente = db.carritoDao().obtenerProducto(idProducto)
 
                     val cantidadFinal = if (productoExistente != null) {
